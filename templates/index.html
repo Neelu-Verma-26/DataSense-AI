@@ -19,6 +19,17 @@
     <h2>Dataset Preview</h2>
     {{table| safe}}
 
+    <h2>Dataset summary</h2>
+    <p><strong>Rows:</strong> {{rows}}</p>
+    <p><strong>Columns:</strong> {{columns}}</p>
+    
+    <h3>Column Names:</h3>
+    <ul>
+        {% for column in column_names %}
+            <li>{{ column }}</li>
+        {% endfor %}
+    </ul>
+
 <p>Project Under Development</p>
 </body>
 </html>

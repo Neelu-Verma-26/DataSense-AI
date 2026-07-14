@@ -14,8 +14,13 @@ def upload():
         file_path = "uploads/" + uploaded_file.filename
         uploaded_file.save(file_path)
         df = pd.read_csv(file_path)
+
+        rows = df.shape[0]
+        columns = df.shape[1]
+        column_names = list(df.columns)
+
         table = df.head().to_html()
-        return render_template("index.html", table=table)
+        return render_template("index.html", table=table, rows=rows, columns=columns, column_names=column_names)
     return render_template("index.html")
 
 
