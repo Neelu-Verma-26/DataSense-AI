@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
-
-print("Running DataSense AI")
+import pandas as pd
 
 app = Flask(__name__)
 
@@ -12,8 +11,11 @@ def welcome():
 def upload():
     if request.method == "POST":
         uploaded_file = request.files["file"]
-        uploaded_file.save("uploads/" + uploaded_file.filename)
-        return "File Uploaded Successfully!"
+        file_path = "uploads/" + uploaded_file.filename
+        uploaded_file.save(file_path)
+        df = pd.read_csv(file_path)
+        table = df.head().to_html()
+        return render_template("index.html", table=table)
     return render_template("index.html")
 
 

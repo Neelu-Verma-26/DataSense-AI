@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>DataSense AI</title>
 </head>
 <body>
     <h1>DataSense AI</h1>
-<h4>AI-Powered Data Quality & Model Monitoring Platform</h4>
-<h4>Version 0.1</h4>
+    <h4>AI-Powered Data Quality & Model Monitoring Platform</h4>
+    <h4>Version 0.1</h4>
 
-<form action="/upload" method="post" enctype="multipart/form-data">
-    <label for="file">File:</label>
-    <input type="file" name="file" accept=".csv, .xlsx">
-    <button type="submit" value="Submit">Upload</button>
-</form>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label for="file">File:</label>
+        <input type="file" name="file">
+        <button type="submit" value="upload">Upload</button>
+    </form>
+
+    <h2>Dataset Preview</h2>
+    {{table| safe}}
 
 <p>Project Under Development</p>
 </body>
