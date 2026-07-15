@@ -16,9 +16,6 @@
         <button type="submit" value="upload">Upload</button>
     </form>
 
-    <h2>Dataset Preview</h2>
-    {{table| safe}}
-
     <h2>Dataset summary</h2>
     <p><strong>Rows:</strong> {{rows}}</p>
     <p><strong>Columns:</strong> {{columns}}</p>
@@ -29,6 +26,15 @@
             <li>{{ column }}</li>
         {% endfor %}
     </ul>
+
+    <h2>Missing Values</h2>
+    {{ missing_values|safe}}
+
+    <p><strong>Duplicate Rows:</strong> {{ duplicate_rows }}</p>
+
+    <hr>
+    <h2>Dataset Preview</h2>
+    {{table| safe}}
 
 <p>Project Under Development</p>
 </body>
