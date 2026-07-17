@@ -4,6 +4,24 @@ import pandas as pd
 app = Flask(__name__)
 app.secret_key =  "datasense_ai_secret_key"
 
+def generate_dataset_report(df):
+    rows = df.shape[0]
+    columns = df.shape[1]
+    column_names = list(df.columns)
+    
+    missing_values = df.isnull().sum()
+    missing_values = missing_values[missing_values > 0]
+    if missing_values.empty:
+            missing_values_html = "<p>No Missing Values found</p>"
+    else:
+            missing_values_html = (missing_values.to_frame(name="Missing Values").to_html())
+
+    duplicate_rows = df.duplicated().sum()
+
+    table = df.head().to_html()
+
+    return rows, columns, column_names, missing_values_html, duplicate_rows, table         
+
 @app.route("/")
 def welcome():
     return "THIS IS DATASENSE AI"
@@ -19,20 +37,8 @@ def upload():
         uploaded_file.save(file_path)
         df = pd.read_csv(file_path)
 
-        missing_values = df.isnull().sum()
-        missing_values = missing_values[missing_values > 0]
-        if missing_values.empty:
-            missing_values_html = "<p>No Missing Values found</p>"
-        else:
-            missing_values_html = (missing_values.to_frame(name="Missing Values").to_html())
+        rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
 
-        duplicate_rows = df.duplicated().sum()
-    
-        rows = df.shape[0]
-        columns = df.shape[1]
-        column_names = list(df.columns)
-
-        table = df.head().to_html()
         return render_template("index.html",
                                 table=table,
                                 rows=rows,
@@ -53,20 +59,7 @@ def remove_duplicates():
 
     df.to_csv(file_path, index=False)
 
-    rows = df.shape[0]
-    columns = df.shape[1]
-    column_names = list(df.columns)
-
-    missing_values = df.isnull().sum()
-    missing_values = missing_values[missing_values > 0]
-    if missing_values.empty:
-        missing_values_html = "<p>No Missing Values found</p>"
-    else:
-        missing_values_html = (missing_values.to_frame(name="Missing Values").to_html())
-
-    duplicate_rows = df.duplicated().sum()
-
-    table = df.head().to_html()
+    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
 
     return render_template("index.html",
                                 table=table,
@@ -89,21 +82,7 @@ def remove_missing_rows():
 
     df.to_csv(file_path, index = False)
 
-    rows = df.shape[0]
-    columns = df.shape[1]
-    column_names = list(df.columns)
-
-    missing_values = df.isnull().sum()
-    missing_values = missing_values[missing_values > 0]
-    if missing_values.empty:
-        missing_values_html = "<p>No Missing Values found</p>"
-    else:
-        missing_values_html = (missing_values.to_frame(name="Missing Values").to_html())
-
-    duplicate_rows = df.duplicated().sum()
-
-    table = df.head().to_html()
-
+    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
 
     return render_template("index.html",
                            table=table,
