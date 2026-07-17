@@ -92,6 +92,29 @@ def remove_missing_rows():
                            missing_values = missing_values_html,
                            duplicate_rows = duplicate_rows)
 
+@app.route("/fill_mean", methods = ["POST"])
+def fill_mean():
+    file_path = session.get("file_path")
+    if file_path is None:
+          return "Please upload a file first."
+    
+    df = pd.read_csv(file_path)
+
+    numeric_df = df.select_dtypes(include="number")
+    for column in numeric_df.columns:
+         df[column] = df[column].fillna(df[column].mean())
+
+    df.to_csv(file_path, index=False)
+
+    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+
+    return render_template("index.html",
+                            table=table,
+                            rows=rows,
+                            columns=columns,
+                            column_names=column_names,
+                            missing_values = missing_values_html,
+                            duplicate_rows = duplicate_rows)
 
 if __name__ == "__main__":
     app.run(debug = True, port=5001)
