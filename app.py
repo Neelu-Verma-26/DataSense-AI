@@ -76,5 +76,43 @@ def remove_duplicates():
                                 missing_values = missing_values_html,
                                 duplicate_rows = duplicate_rows)
 
+@app.route("/remove_missing_rows", methods = ["POST"])
+def remove_missing_rows():
+    file_path = session.get("file_path")
+
+    if file_path is None:
+        return "Please upload a file first."
+
+    df = pd.read_csv(file_path)
+
+    df.dropna(inplace=True)
+
+    df.to_csv(file_path, index = False)
+
+    rows = df.shape[0]
+    columns = df.shape[1]
+    column_names = list(df.columns)
+
+    missing_values = df.isnull().sum()
+    missing_values = missing_values[missing_values > 0]
+    if missing_values.empty:
+        missing_values_html = "<p>No Missing Values found</p>"
+    else:
+        missing_values_html = (missing_values.to_frame(name="Missing Values").to_html())
+
+    duplicate_rows = df.duplicated().sum()
+
+    table = df.head().to_html()
+
+
+    return render_template("index.html",
+                           table=table,
+                           rows=rows,
+                           columns=columns,
+                           column_names=column_names,
+                           missing_values = missing_values_html,
+                           duplicate_rows = duplicate_rows)
+
+
 if __name__ == "__main__":
     app.run(debug = True, port=5001)
