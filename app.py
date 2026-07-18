@@ -109,7 +109,56 @@ def fill_mean():
     rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
 
     return render_template("index.html",
-                            table=table,
+                            table=table, 
+                            rows=rows,
+                            columns=columns,
+                            column_names=column_names,
+                            missing_values = missing_values_html,
+                            duplicate_rows = duplicate_rows)
+
+@app.route("/fill_median",methods= ["POST"])
+def fill_median():
+    file_path = session.get("file_path")
+    if file_path is None:
+          return "Please upload a file first"
+     
+    df = pd.read_csv(file_path)
+
+    numeric_df = df.select_dtypes(include="number")
+    for column in numeric_df.columns:
+         df[column] = df[column].fillna(df[column].median())
+
+    df.to_csv(file_path, index=False)
+
+    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+
+    return render_template("index.html",
+                            table=table, 
+                            rows=rows,
+                            columns=columns,
+                            column_names=column_names,
+                            missing_values = missing_values_html,
+                            duplicate_rows = duplicate_rows)
+
+@app.route("/fill_mode", methods = ["POST"])
+def fill_mode():
+    file_path = session.get("file_path")
+    if file_path is None:
+          return "Please upload a file first"
+     
+    df = pd.read_csv(file_path)
+
+    for column in df.columns:
+        mode_value = df[column].mode()
+        if not mode_value.empty:
+            df[column] = df[column].fillna(mode_value[0], inplace=True)
+
+    df.to_csv(file_path, index=False)
+
+    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+
+    return render_template("index.html",
+                            table=table, 
                             rows=rows,
                             columns=columns,
                             column_names=column_names,
