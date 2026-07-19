@@ -16,6 +16,26 @@
         <button type="submit" value="upload">Upload</button>
     </form>
 
+    <hr>
+    <h2>Dataset Preview</h2>
+    {{table| safe}}
+
+    <h2>Dataset summary</h2>
+    <p><strong>Rows:</strong> {{rows}}</p>
+    <p><strong>Columns:</strong> {{columns}}</p>
+    
+    <h3>Column Names:</h3>
+    <ul>
+        {% for column in column_names %}
+            <li>{{ column }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Missing Values</h2>
+    {{ missing_values|safe}}
+
+    <p><strong>Duplicate Rows:</strong> {{ duplicate_rows }}</p>
+
     <h2>Data Cleaning</h2>
     <form action="/remove_duplicates" method="post">
         <button type="submit">
@@ -55,26 +75,35 @@
         </button>
     </form>
 
-    <h2>Dataset summary</h2>
-    <p><strong>Rows:</strong> {{rows}}</p>
-    <p><strong>Columns:</strong> {{columns}}</p>
+    <br>
+
+    <form action="/show_statistics" method="post">
+        <button type="submit">
+            Show Statistics
+        </button>
+    </form>
+
+    <h3>Mean</h3>
+    {{ mean_html|safe }}
+
+    <h3>Median</h3>
+    {{ median_html|safe }}
+
+    <h3>Mode</h3>
+    {{ mode_html|safe }}
+
+    <h3>Minimum</h3>
+    {{ min_html|safe }}
+
+    <h3>Maximum</h3>
+    {{ max_html|safe }}
+
+    <h3>Standard Deviation</h3>
+    {{ std_html|safe }}
+
+    <h3>Variance</h3>
+    {{ variance_html|safe }}
     
-    <h3>Column Names:</h3>
-    <ul>
-        {% for column in column_names %}
-            <li>{{ column }}</li>
-        {% endfor %}
-    </ul>
-
-    <h2>Missing Values</h2>
-    {{ missing_values|safe}}
-
-    <p><strong>Duplicate Rows:</strong> {{ duplicate_rows }}</p>
-
-    <hr>
-    <h2>Dataset Preview</h2>
-    {{table| safe}}
-
 <p>Project Under Development</p>
 </body>
 </html>
