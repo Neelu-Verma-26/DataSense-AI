@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, session
 import pandas as pd
+import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 app.secret_key =  "datasense_ai_secret_key"
@@ -208,6 +209,35 @@ def show_statistics():
                             std_html=std_html,
                             variance_html=variance_html)
 
+@app.route("/show_histogram", methods=["POST"])
+def show_histogram():
+    selected_column = request.form.get("column")
+    file_path = session.get("file_path")
+    if file_path is None:
+          return "Please upload a file first"
+    
+    df = pd.read_csv(file_path)
+
+    column_data = df[selected_column]
+    plt.figure(figsize=(8,5))
+    plt.hist(column_data, bins=20)
+    plt.title(f"Histogram of {selected_column}")
+    plt.xlabel(selected_column)
+    plt.ylabel("Frequency")
+    plt.grid(True)
+    plt.savefig("static/histogram.png")
+    plt.close()
+
+    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+
+    return render_template("index.html",
+                            table=table, 
+                            rows=rows,
+                            columns=columns,
+                            column_names=column_names,
+                            missing_values = missing_values_html,
+                            duplicate_rows = duplicate_rows,
+                            histogram_image="histogram.png")
 
 if __name__ == "__main__":
     app.run(debug = True, port=5001)
