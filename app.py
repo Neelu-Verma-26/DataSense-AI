@@ -239,5 +239,33 @@ def show_histogram():
                             duplicate_rows = duplicate_rows,
                             histogram_image="histogram.png")
 
+@app.route("/show_boxplot", methods=["POST"])
+def show_boxplot():
+    selected_column = request.form.get("column")
+    file_path = session.get("file_path")
+    if file_path is None:
+          return "Please upload a file first"
+    
+    df = pd.read_csv(file_path)
+    column_data = df[selected_column]
+    plt.figure(figsize=(8,5))
+    plt.boxplot(column_data)
+    plt.title(f"Box Plot of {selected_column}")
+    plt.ylabel(selected_column)
+    plt.grid(True)
+    plt.savefig("static/boxplot.png")
+    plt.close()
+
+    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+
+    return render_template("index.html",
+                            table=table, 
+                            rows=rows,
+                            columns=columns,
+                            column_names=column_names,
+                            missing_values = missing_values_html,
+                            duplicate_rows = duplicate_rows,
+                            boxplot_image="boxplot.png")
+
 if __name__ == "__main__":
     app.run(debug = True, port=5001)
