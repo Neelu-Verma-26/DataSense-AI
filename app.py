@@ -267,5 +267,56 @@ def show_boxplot():
                             duplicate_rows = duplicate_rows,
                             boxplot_image="boxplot.png")
 
+@app.route("/show_scatter", methods=["POST"])
+def show_scatter():
+    x_column = request.form.get("x_column")
+    y_column = request.form.get("y_column")
+    file_path = session.get("file_path")
+    if file_path is None:
+        return "Please upload a file first"
+    
+    df = pd.read_csv(file_path)
+
+    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+
+    if not pd.api.types.is_numeric_dtype(df[x_column]) or not pd.api.types.is_numeric_dtype(df[y_column]):
+        return render_template(
+            "index.html",
+            error="Please select numeric columns.",
+            table=table,
+            rows=rows,
+            columns=columns,
+            column_names=column_names,
+            missing_values_html=missing_values_html,
+            duplicate_rows=duplicate_rows,
+            histogram_image=None,
+            boxplot_image=None,
+            scatter_image=None
+        )
+
+    x_data = df[x_column]
+    y_data = df[y_column]
+
+    plt.figure(figsize=(8,5))
+    plt.scatter(x_data, y_data)
+    plt.title(f"Scatter Plot of {x_column} vs {y_column}")
+    plt.xlabel(x_column)
+    plt.ylabel(y_column)
+    plt.savefig("static/scatter.png")
+    plt.close()
+
+    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+
+    return render_template("index.html",
+                           table=table,
+                           rows=rows,
+                           columns=columns,
+                           column_names=column_names,
+                           missing_values_html=missing_values_html,
+                           duplicate_rows=duplicate_rows,
+                           scatter_image= "scatter.png",
+                           histogram_image=None,
+                           boxplot_image=None)
+
 if __name__ == "__main__":
     app.run(debug = True, port=5001)

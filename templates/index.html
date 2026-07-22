@@ -121,6 +121,7 @@
         <img src="{{ url_for('static', filename=histogram_image) }}", alt="Histogram">
     {% endif %}
 
+    <hr>
     <form action="/show_boxplot" method="post">
         <label for="box_column">Select Column:</label>
         <select name="column" id="box_column">
@@ -135,6 +136,38 @@
     {% if boxplot_image %}
         <h3>Box Plot</h3>
         <img src="{{ url_for('static', filename=boxplot_image) }}" alt="Box Plot">
+    {% endif %}
+
+    <hr>
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+
+    <form action="/show_scatter" method="post">
+        <label for="x_column">Select X-axis: </label>
+        <select name="x_column" id="x_column">
+            {% for column in column_names %}
+                <option value="{{ column }}">
+                    {{ column }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="y_column">Select Y-axis: </label>
+        <select name="y_column" id="y_column">
+            {% for column in column_names %}
+                <option value="{{ column }}">
+                    {{ column }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Show Scatter Plot</button>
+    </form>
+
+    {% if scatter_image %}
+        <h3>Scatter Plot</h3>
+        <img src="{{ url_for('static', filename=scatter_image) }}" alt="Scatter Plot">
     {% endif %}
 
 <p>Project Under Development</p>
