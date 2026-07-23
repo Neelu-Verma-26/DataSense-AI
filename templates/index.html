@@ -170,6 +170,16 @@
         <img src="{{ url_for('static', filename=scatter_image) }}" alt="Scatter Plot">
     {% endif %}
 
+    <hr>
+    <form action="/show_heatmap" method="post">
+        <button type="submit">Show Heatmap</button>
+    </form>
+
+    {% if heatmap_image %}
+        <h3>Correlation Heatmap</h3>
+        <img src="{{ url_for('static', filename=heatmap_image) }}" alt="Correlation Heatmap">
+    {% endif %}
+
 <p>Project Under Development</p>
 </body>
 </html>

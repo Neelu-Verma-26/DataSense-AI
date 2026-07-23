@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, session
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 app = Flask(__name__)
 app.secret_key =  "datasense_ai_secret_key"
@@ -317,6 +318,50 @@ def show_scatter():
                            scatter_image= "scatter.png",
                            histogram_image=None,
                            boxplot_image=None)
+
+@app.route("/show_heatmap", methods=["POST"])
+def show_heatmap():
+    file_path = session.get("file_path")
+    if file_path is None:
+        return "Please upload a file first"
+    df= pd.read_csv(file_path)
+
+    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+    
+    numeric_df =  df.select_dtypes(include="number")
+    if numeric_df.empty:
+         return render_template("index.html",
+                                error="Dataset does not contain numeric columns.",
+                                table=table,
+                                rows=rows,
+                                columns=columns,
+                                column_names=column_names,
+                                missing_values_html=missing_values_html,
+                                duplicate_rows=duplicate_rows,
+                                histogram_image=None,
+                                boxplot_image=None,
+                                scatter_image=None,
+                                heatmap_image = None)
+    
+    correlation_matrix = numeric_df.corr()
+    plt.figure(figsize=(10,8))
+    sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm")
+    plt.tight_layout()
+    plt.title("Correlation Heatmap")
+    plt.savefig("static/heatmap.png")
+    plt.close()
+
+    return render_template("index.html",
+                            table=table,
+                            rows=rows,
+                            columns=columns,
+                            column_names=column_names,
+                            missing_values_html=missing_values_html,
+                            duplicate_rows=duplicate_rows,
+                            histogram_image=None,
+                            boxplot_image=None,
+                            scatter_image=None,
+                            heatmap_image = "heatmap.png")
 
 if __name__ == "__main__":
     app.run(debug = True, port=5001)
