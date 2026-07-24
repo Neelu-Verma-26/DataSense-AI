@@ -363,5 +363,43 @@ def show_heatmap():
                             scatter_image=None,
                             heatmap_image = "heatmap.png")
 
+@app.route("/show_barchart",methods=["POST"])
+def show_barchart():
+    file_path = session.get("file_path")
+    if file_path is None:
+        return "Please upload a file first"
+    df= pd.read_csv(file_path)
+    
+    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+
+    selected_column = request.form["bar_column"]
+
+    counts = df[selected_column].value_counts()
+    plt.figure(figsize=(8,5))
+    plt.bar(counts.index, counts.values)
+    plt.title(f"Bar Chart of {selected_column}")
+    plt.xlabel(selected_column)
+    plt.ylabel("Count")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig("static/barchart.png")
+    plt.close()
+
+    return render_template("index.html",
+                            table=table,
+                            rows=rows,
+                            columns=columns,
+                            column_names=column_names,
+                            missing_values_html=missing_values_html,
+                            duplicate_rows=duplicate_rows,
+                            histogram_image=None,
+                            boxplot_image=None,
+                            scatter_image=None,
+                            heatmap_image = None,
+                            selected_bar_column=selected_column,
+                            barchart_image = "barchart.png")
+
+            
+
 if __name__ == "__main__":
     app.run(debug = True, port=5001)
