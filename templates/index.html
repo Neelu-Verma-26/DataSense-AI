@@ -197,7 +197,37 @@
     {% if barchart_image %}
         <h3>Bar Chart</h3>
         <img src="{{ url_for('static', filename=barchart_image) }}" alt="Bar Chart">
-    {%endif %}
+    {% endif %}
+
+    <hr>
+    {% if line_error %}
+        <p style="color:red;">{{ line_error }}</p>
+    {% endif %}
+    <form action="/show_linechart" method="post">
+        <label for="x_column">Select X-axis: </label>
+        <select name="x_column" id="x_column">
+            {% for column in column_names %}
+                <option value="{{ column }}">
+                    {{ column }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="y_column">Select Y-axis: </label>
+        <select name="y_column" id="y_column">
+            {% for column in column_names %}
+                <option value="{{ column }}">
+                    {{ column }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Show Line Chart</button>
+    </form>
+    {% if linechart_image %}
+        <h3>Line Chart</h3>
+        <img src="{{ url_for('static', filename=linechart_image) }}" alt="Line Chart">
+    {% endif %}
 
 <p>Project Under Development</p>
 </body>

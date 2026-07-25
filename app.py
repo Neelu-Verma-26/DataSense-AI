@@ -399,7 +399,61 @@ def show_barchart():
                             selected_bar_column=selected_column,
                             barchart_image = "barchart.png")
 
-            
+@app.route("/show_linechart", methods=["POST"])
+def show_linechart():
+    x_column = request.form.get("x_column")
+    y_column = request.form.get("y_column")
+    file_path = session.get("file_path")
+    if file_path is None:
+        return "Please upload a file first"
+    
+    df = pd.read_csv(file_path)
+
+    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+
+    if not pd.api.types.is_numeric_dtype(df[y_column]):
+        return render_template(
+            "index.html",
+            line_error="Please select a numeric column for the Y-axis.",
+            table=table,
+            rows=rows,
+            columns=columns,
+            column_names=column_names,
+            missing_values_html=missing_values_html,
+            duplicate_rows=duplicate_rows,
+            histogram_image=None,
+            boxplot_image=None,
+            scatter_image=None,
+            heatmap_image = None,
+            barchart_image = None,
+            linechart_image = None)
+
+    x_data = df[x_column]
+    y_data = df[y_column]
+
+    plt.figure(figsize=(8,5))
+    plt.plot(x_data, y_data)
+    plt.title(f"Line Chart of {x_column} vs {y_column}")
+    plt.xlabel(x_column)
+    plt.ylabel(y_column)
+    plt.tight_layout()
+    plt.savefig("static/linechart.png")
+    plt.close()
+
+    return render_template("index.html",
+                           table=table,
+                           rows=rows,
+                           columns=columns,
+                           column_names=column_names,
+                           missing_values_html=missing_values_html,
+                           duplicate_rows=duplicate_rows,
+                           histogram_image=None,
+                           boxplot_image=None,
+                           scatter_image=None,
+                           heatmap_image = None,
+                           barchart_image = None,
+                           linechart_image = "linechart.png")
+
 
 if __name__ == "__main__":
     app.run(debug = True, port=5001)
