@@ -454,6 +454,63 @@ def show_linechart():
                            barchart_image = None,
                            linechart_image = "linechart.png")
 
+@app.route("/show_piechart",methods=["POST"])
+def show_piechart():
+    file_path = session.get("file_path")
+    if file_path is None:
+        return "Please upload a file first"
+    df= pd.read_csv(file_path)
+    
+    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+
+    selected_column = request.form["pie_column"]
+
+    if df[selected_column].nunique() > 10:
+        return render_template(
+            "index.html",
+            table=table,
+            rows=rows,
+            columns=columns,
+            column_names=column_names,
+            missing_values_html=missing_values_html,
+            duplicate_rows=duplicate_rows,
+            selected_pie_column=selected_column,
+            pie_error="Pie chart is suitable only for columns with 10 or fewer unique values.",
+            histogram_image=None,
+            boxplot_image=None,
+            scatter_image=None,
+            heatmap_image=None,
+            barchart_image=None,
+            linechart_image=None,
+            piechart_image=None
+        )
+
+    counts = df[selected_column].value_counts(dropna=False)
+    plt.figure(figsize=(8,5))
+    plt.pie(counts.values, labels=counts.index,  autopct="%1.1f%%")
+    plt.title(f"Pie Chart of {selected_column}")
+    plt.axis("equal") 
+    plt.tight_layout()
+    plt.savefig("static/piechart.png")
+    plt.close()
+
+    return render_template("index.html",
+                            table=table,
+                            rows=rows,
+                            columns=columns,
+                            column_names=column_names,
+                            missing_values_html=missing_values_html,
+                            duplicate_rows=duplicate_rows,
+                            histogram_image=None,
+                            boxplot_image=None,
+                            scatter_image=None,
+                            heatmap_image = None,
+                            barchart_image = None,
+                            linechart_image = None,
+                            selected_pie_column=selected_column,
+                            pie_error=None,
+                            piechart_image = "piechart.png")
+
 
 if __name__ == "__main__":
     app.run(debug = True, port=5001)
