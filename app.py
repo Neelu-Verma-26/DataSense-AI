@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, send_file
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -511,6 +511,13 @@ def show_piechart():
                             pie_error=None,
                             piechart_image = "piechart.png")
 
+@app.route("/download_csv")
+def download_csv():
+    file_path = session.get("file_path")
+    if file_path is None:
+        return "Please upload a file first"
+
+    return send_file(file_path, as_attachment=True)
 
 if __name__ == "__main__":
     app.run(debug = True, port=5001)
