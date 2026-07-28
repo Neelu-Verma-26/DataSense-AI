@@ -16,25 +16,28 @@
         <button type="submit" value="upload">Upload</button>
     </form>
 
+    {% if report %}
+
     <hr>
     <h2>Dataset Preview</h2>
-    {{table| safe}}
+    {{ report.table| safe }}
 
     <h2>Dataset summary</h2>
-    <p><strong>Rows:</strong> {{rows}}</p>
-    <p><strong>Columns:</strong> {{columns}}</p>
+    <p><strong>Rows:</strong> {{ report.rows }}</p>
+    <p><strong>Columns:</strong> {{ report.columns }}</p>
+    <p><strong>Memory Usage:</strong> {{ report.memory_usage }}</p>
     
     <h3>Column Names:</h3>
     <ul>
-        {% for column in column_names %}
+        {% for column in report.column_names %}
             <li>{{ column }}</li>
         {% endfor %}
     </ul>
 
     <h2>Missing Values</h2>
-    {{ missing_values|safe}}
+    {{ report.missing_values_html | safe }}
 
-    <p><strong>Duplicate Rows:</strong> {{ duplicate_rows }}</p>
+    <p><strong>Duplicate Rows:</strong> {{ report.duplicate_rows }}</p>
 
     <h2>Data Cleaning</h2>
     <form action="/remove_duplicates" method="post">
@@ -114,7 +117,7 @@
     <form action="/show_histogram" method="post">
         <label for="column">Select Column:</label>
         <select name="column" id="column">
-            {% for column in column_names %}
+            {% for column in report.column_names %}
                 <option value="{{ column }}">
                     {{ column }}
                 </option>
@@ -131,7 +134,7 @@
     <form action="/show_boxplot" method="post">
         <label for="box_column">Select Column:</label>
         <select name="column" id="box_column">
-            {% for column in column_names %}
+            {% for column in report.column_names %}
                 <option value="{{ column }}">
                     {{ column }}
                 </option>
@@ -152,7 +155,7 @@
     <form action="/show_scatter" method="post">
         <label for="x_column">Select X-axis: </label>
         <select name="x_column" id="x_column">
-            {% for column in column_names %}
+            {% for column in report.column_names %}
                 <option value="{{ column }}">
                     {{ column }}
                 </option>
@@ -161,7 +164,7 @@
 
         <label for="y_column">Select Y-axis: </label>
         <select name="y_column" id="y_column">
-            {% for column in column_names %}
+            {% for column in report.column_names %}
                 <option value="{{ column }}">
                     {{ column }}
                 </option>
@@ -190,7 +193,7 @@
     <form action="/show_barchart" method="post">
         <label for="bar_column">Select Column:</label>
         <select name="bar_column" id="bar_column">
-            {% for column in column_names %}
+            {% for column in report.column_names %}
             <option value="{{ column }}">
                 {% if column == selected_bar_column %}selected{% endif %}>
                 {{ column }}
@@ -212,7 +215,7 @@
     <form action="/show_linechart" method="post">
         <label for="x_column">Select X-axis: </label>
         <select name="x_column" id="x_column">
-            {% for column in column_names %}
+            {% for column in report.column_names %}
                 <option value="{{ column }}">
                     {{ column }}
                 </option>
@@ -221,7 +224,7 @@
 
         <label for="y_column">Select Y-axis: </label>
         <select name="y_column" id="y_column">
-            {% for column in column_names %}
+            {% for column in report.column_names %}
                 <option value="{{ column }}">
                     {{ column }}
                 </option>
@@ -242,7 +245,7 @@
     <form action="/show_piechart" method="post">
         <label for="pie_column">Select Column:</label>
         <select name="pie_column" id="pie_column">
-            {% for column in column_names %}
+            {% for column in report.column_names %}
             <option value="{{ column }}">
                 {% if column == selected_pie_column %}selected{% endif %}>
                 {{ column }}
@@ -257,6 +260,8 @@
     <img src="{{ url_for('static', filename=piechart_image) }}" alt="Pie Chart">
     {% endif %}
     
-<p>Project Under Development</p>
+    {% endif %}
+
+    <p>Project Under Development</p>
 </body>
 </html>

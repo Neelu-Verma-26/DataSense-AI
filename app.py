@@ -22,7 +22,22 @@ def generate_dataset_report(df):
 
     table = df.head().to_html()
 
-    return rows, columns, column_names, missing_values_html, duplicate_rows, table         
+    memory = df.memory_usage().sum()
+
+    if memory < (1024 ** 2):
+        memory_size = f"{memory / 1024:.2f} KB"
+    else:
+        memory_size = f"{memory / (1024 ** 2):.2f} MB"
+
+    return {
+    "rows": rows,
+    "columns": columns,
+    "column_names": column_names,
+    "missing_values_html": missing_values_html,
+    "duplicate_rows": duplicate_rows,
+    "table": table,
+    "memory_usage": memory_size
+}        
 
 @app.route("/")
 def welcome():
@@ -39,17 +54,12 @@ def upload():
         uploaded_file.save(file_path)
         df = pd.read_csv(file_path)
 
-        rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+        report = generate_dataset_report(df)
 
         return render_template("index.html",
-                                table=table,
-                                rows=rows,
-                                columns=columns,
-                                column_names=column_names,
-                                missing_values = missing_values_html,
-                                duplicate_rows = duplicate_rows)
+                                report=report)
     
-    return render_template("index.html")
+    return render_template("index.html", report=None)
 
 @app.route("/remove_duplicates", methods = ["POST"])
 def remove_duplicates():
@@ -61,15 +71,10 @@ def remove_duplicates():
 
     df.to_csv(file_path, index=False)
 
-    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+    report = generate_dataset_report(df)
 
     return render_template("index.html",
-                                table=table,
-                                rows=rows,
-                                columns=columns,
-                                column_names=column_names,
-                                missing_values = missing_values_html,
-                                duplicate_rows = duplicate_rows)
+                            report = report)
 
 @app.route("/remove_missing_rows", methods = ["POST"])
 def remove_missing_rows():
@@ -84,15 +89,10 @@ def remove_missing_rows():
 
     df.to_csv(file_path, index = False)
 
-    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+    report = generate_dataset_report(df)
 
     return render_template("index.html",
-                           table=table,
-                           rows=rows,
-                           columns=columns,
-                           column_names=column_names,
-                           missing_values = missing_values_html,
-                           duplicate_rows = duplicate_rows)
+                           report=report)
 
 @app.route("/fill_mean", methods = ["POST"])
 def fill_mean():
@@ -108,15 +108,10 @@ def fill_mean():
 
     df.to_csv(file_path, index=False)
 
-    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+    report = generate_dataset_report(df)
 
     return render_template("index.html",
-                            table=table, 
-                            rows=rows,
-                            columns=columns,
-                            column_names=column_names,
-                            missing_values = missing_values_html,
-                            duplicate_rows = duplicate_rows)
+                            report= report)
 
 @app.route("/fill_median",methods= ["POST"])
 def fill_median():
@@ -132,15 +127,10 @@ def fill_median():
 
     df.to_csv(file_path, index=False)
 
-    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+    report = generate_dataset_report(df)
 
     return render_template("index.html",
-                            table=table, 
-                            rows=rows,
-                            columns=columns,
-                            column_names=column_names,
-                            missing_values = missing_values_html,
-                            duplicate_rows = duplicate_rows)
+                            report=report)
 
 @app.route("/fill_mode", methods = ["POST"])
 def fill_mode():
@@ -153,19 +143,14 @@ def fill_mode():
     for column in df.columns:
         mode_value = df[column].mode()
         if not mode_value.empty:
-            df[column] = df[column].fillna(mode_value[0], inplace=True)
+            df[column] = df[column].fillna(mode_value[0])
 
     df.to_csv(file_path, index=False)
 
-    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+    report = generate_dataset_report(df)
 
     return render_template("index.html",
-                            table=table, 
-                            rows=rows,
-                            columns=columns,
-                            column_names=column_names,
-                            missing_values = missing_values_html,
-                            duplicate_rows = duplicate_rows)
+                            report=report)
 
 @app.route("/show_statistics", methods=["POST"])
 def show_statistics():
@@ -192,15 +177,10 @@ def show_statistics():
     std_html = std_values.to_frame(name="Standard Deviation").to_html(classes="table table-bordered")
     variance_html = variance_values.to_frame(name="Variance").to_html(classes="table table-bordered")
 
-    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+    report = generate_dataset_report(df)
 
     return render_template("index.html",
-                            table=table, 
-                            rows=rows,
-                            columns=columns,
-                            column_names=column_names,
-                            missing_values = missing_values_html,
-                            duplicate_rows = duplicate_rows,
+                            report=report,
                             
                             mean_html=mean_html,
                             median_html=median_html,
@@ -229,15 +209,10 @@ def show_histogram():
     plt.savefig("static/histogram.png")
     plt.close()
 
-    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+    report = generate_dataset_report(df)
 
     return render_template("index.html",
-                            table=table, 
-                            rows=rows,
-                            columns=columns,
-                            column_names=column_names,
-                            missing_values = missing_values_html,
-                            duplicate_rows = duplicate_rows,
+                            report=report,
                             histogram_image="histogram.png")
 
 @app.route("/show_boxplot", methods=["POST"])
@@ -257,15 +232,10 @@ def show_boxplot():
     plt.savefig("static/boxplot.png")
     plt.close()
 
-    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+    report = generate_dataset_report(df)
 
     return render_template("index.html",
-                            table=table, 
-                            rows=rows,
-                            columns=columns,
-                            column_names=column_names,
-                            missing_values = missing_values_html,
-                            duplicate_rows = duplicate_rows,
+                            report=report,
                             boxplot_image="boxplot.png")
 
 @app.route("/show_scatter", methods=["POST"])
@@ -278,18 +248,12 @@ def show_scatter():
     
     df = pd.read_csv(file_path)
 
-    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+    report = generate_dataset_report(df)
 
     if not pd.api.types.is_numeric_dtype(df[x_column]) or not pd.api.types.is_numeric_dtype(df[y_column]):
         return render_template(
             "index.html",
-            error="Please select numeric columns.",
-            table=table,
-            rows=rows,
-            columns=columns,
-            column_names=column_names,
-            missing_values_html=missing_values_html,
-            duplicate_rows=duplicate_rows,
+            report = report,
             histogram_image=None,
             boxplot_image=None,
             scatter_image=None
@@ -306,15 +270,8 @@ def show_scatter():
     plt.savefig("static/scatter.png")
     plt.close()
 
-    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
-
     return render_template("index.html",
-                           table=table,
-                           rows=rows,
-                           columns=columns,
-                           column_names=column_names,
-                           missing_values_html=missing_values_html,
-                           duplicate_rows=duplicate_rows,
+                           report = report,
                            scatter_image= "scatter.png",
                            histogram_image=None,
                            boxplot_image=None)
@@ -326,18 +283,13 @@ def show_heatmap():
         return "Please upload a file first"
     df= pd.read_csv(file_path)
 
-    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+    report = generate_dataset_report(df)
     
     numeric_df =  df.select_dtypes(include="number")
     if numeric_df.empty:
          return render_template("index.html",
                                 error="Dataset does not contain numeric columns.",
-                                table=table,
-                                rows=rows,
-                                columns=columns,
-                                column_names=column_names,
-                                missing_values_html=missing_values_html,
-                                duplicate_rows=duplicate_rows,
+                                report = report,
                                 histogram_image=None,
                                 boxplot_image=None,
                                 scatter_image=None,
@@ -352,12 +304,7 @@ def show_heatmap():
     plt.close()
 
     return render_template("index.html",
-                            table=table,
-                            rows=rows,
-                            columns=columns,
-                            column_names=column_names,
-                            missing_values_html=missing_values_html,
-                            duplicate_rows=duplicate_rows,
+                            report=report,
                             histogram_image=None,
                             boxplot_image=None,
                             scatter_image=None,
@@ -370,7 +317,7 @@ def show_barchart():
         return "Please upload a file first"
     df= pd.read_csv(file_path)
     
-    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+    report = generate_dataset_report(df)
 
     selected_column = request.form["bar_column"]
 
@@ -386,12 +333,7 @@ def show_barchart():
     plt.close()
 
     return render_template("index.html",
-                            table=table,
-                            rows=rows,
-                            columns=columns,
-                            column_names=column_names,
-                            missing_values_html=missing_values_html,
-                            duplicate_rows=duplicate_rows,
+                            report=report,
                             histogram_image=None,
                             boxplot_image=None,
                             scatter_image=None,
@@ -409,18 +351,13 @@ def show_linechart():
     
     df = pd.read_csv(file_path)
 
-    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+    report = generate_dataset_report(df)
 
     if not pd.api.types.is_numeric_dtype(df[y_column]):
         return render_template(
             "index.html",
             line_error="Please select a numeric column for the Y-axis.",
-            table=table,
-            rows=rows,
-            columns=columns,
-            column_names=column_names,
-            missing_values_html=missing_values_html,
-            duplicate_rows=duplicate_rows,
+            report=report,
             histogram_image=None,
             boxplot_image=None,
             scatter_image=None,
@@ -441,12 +378,7 @@ def show_linechart():
     plt.close()
 
     return render_template("index.html",
-                           table=table,
-                           rows=rows,
-                           columns=columns,
-                           column_names=column_names,
-                           missing_values_html=missing_values_html,
-                           duplicate_rows=duplicate_rows,
+                           report=report,
                            histogram_image=None,
                            boxplot_image=None,
                            scatter_image=None,
@@ -461,19 +393,14 @@ def show_piechart():
         return "Please upload a file first"
     df= pd.read_csv(file_path)
     
-    rows, columns, column_names, missing_values_html, duplicate_rows, table = generate_dataset_report(df)
+    report = generate_dataset_report(df)
 
     selected_column = request.form["pie_column"]
 
     if df[selected_column].nunique() > 10:
         return render_template(
             "index.html",
-            table=table,
-            rows=rows,
-            columns=columns,
-            column_names=column_names,
-            missing_values_html=missing_values_html,
-            duplicate_rows=duplicate_rows,
+            report=report,
             selected_pie_column=selected_column,
             pie_error="Pie chart is suitable only for columns with 10 or fewer unique values.",
             histogram_image=None,
@@ -495,12 +422,7 @@ def show_piechart():
     plt.close()
 
     return render_template("index.html",
-                            table=table,
-                            rows=rows,
-                            columns=columns,
-                            column_names=column_names,
-                            missing_values_html=missing_values_html,
-                            duplicate_rows=duplicate_rows,
+                            report=report,
                             histogram_image=None,
                             boxplot_image=None,
                             scatter_image=None,
