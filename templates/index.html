@@ -26,6 +26,8 @@
     <p><strong>Rows:</strong> {{ report.rows }}</p>
     <p><strong>Columns:</strong> {{ report.columns }}</p>
     <p><strong>Memory Usage:</strong> {{ report.memory_usage }}</p>
+    <p><strong>Numeric Columns:</strong> {{ report.numeric_columns }}</p>
+    <p><strong>Categorical Columns:</strong> {{ report.categorical_columns }}</p>
     
     <h3>Column Names:</h3>
     <ul>
@@ -34,8 +36,17 @@
         {% endfor %}
     </ul>
 
+    <h3>Column Data Types</h3>
+    {{ report.column_types_html | safe }}
+
+    <h3>Unique Values</h3>
+    {{ report.unique_values_html | safe }}
+
     <h2>Missing Values</h2>
     {{ report.missing_values_html | safe }}
+    
+    <h3>Missing Percentage</h3>
+    {{ report.missing_percentage_html | safe }}
 
     <p><strong>Duplicate Rows:</strong> {{ report.duplicate_rows }}</p>
 

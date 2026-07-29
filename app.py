@@ -29,6 +29,21 @@ def generate_dataset_report(df):
     else:
         memory_size = f"{memory / (1024 ** 2):.2f} MB"
 
+    numeric_df = df.select_dtypes(include="number")
+    numeric_columns = numeric_df.shape[1]
+
+    categorical_df = df.select_dtypes(include="object")
+    categorical_columns = categorical_df.shape[1]
+
+    column_types = df.dtypes
+    column_types_html = column_types.to_frame(name="Data Type").to_html()
+
+    unique_values = df.nunique()
+    unique_values_html = unique_values.to_frame(name="Unique Values").to_html()
+
+    missing_percentage = (missing_values / rows) * 100
+    missing_percentage_html = missing_percentage.to_frame(name="Missing Percentage (%)").to_html()
+
     return {
     "rows": rows,
     "columns": columns,
@@ -36,8 +51,12 @@ def generate_dataset_report(df):
     "missing_values_html": missing_values_html,
     "duplicate_rows": duplicate_rows,
     "table": table,
-    "memory_usage": memory_size
-}        
+    "memory_usage": memory_size,
+    "numeric_columns": numeric_columns, 
+    "categorical_columns": categorical_columns,
+    "column_types_html": column_types_html,
+    "unique_values_html":unique_values_html,
+    "missing_percentage_html": missing_percentage_html}        
 
 @app.route("/")
 def welcome():
