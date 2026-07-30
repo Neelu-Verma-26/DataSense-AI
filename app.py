@@ -19,6 +19,13 @@ def generate_dataset_report(df):
             missing_values_html = (missing_values.to_frame(name="Missing Values").to_html())
 
     duplicate_rows = df.duplicated().sum()
+    if duplicate_rows == 0:
+        duplicate_status = "🟢 Excellent"
+        duplicate_message = "No duplicate rows found."
+
+    else:
+        duplicate_status = "🟡 Warning"
+        duplicate_message = f"{duplicate_rows} duplicate rows found."
 
     table = df.head().to_html()
 
@@ -40,9 +47,65 @@ def generate_dataset_report(df):
 
     unique_values = df.nunique()
     unique_values_html = unique_values.to_frame(name="Unique Values").to_html()
+    constant_columns = unique_values[unique_values == 1].index.tolist()
 
     missing_percentage = (missing_values / rows) * 100
     missing_percentage_html = missing_percentage.to_frame(name="Missing Percentage (%)").to_html()
+
+    total_missing = missing_values.sum()
+    overall_missing_percentage = (total_missing / (rows * columns)) * 100
+    duplicate_percentage = (duplicate_rows/rows)*100
+
+    quality_score = 100-overall_missing_percentage-duplicate_percentage
+    quality_score = max(quality_score,0)
+    quality_score = round(quality_score, 2)
+
+    overall_missing_percentage = round(overall_missing_percentage, 2)
+    if overall_missing_percentage==0:
+        missing_status = "🟢 Excellent"
+        missing_message= "No missing values found"
+    elif overall_missing_percentage <= 10:
+        missing_status = "🟡 Warning"
+        missing_message = f"{overall_missing_percentage}% missing values detected."
+    else:
+        missing_status = "🔴 Poor"
+        missing_message =  f"{overall_missing_percentage}% missing values detected."
+
+    correlation_matrix = df.corr(numeric_only=True)
+    highly_correlated = []
+    for i in range(len(correlation_matrix.columns)):
+        for j in range(i + 1, len(correlation_matrix.columns)):
+            if abs(correlation_matrix.iloc[i, j]) >= 0.80:
+                col1 = correlation_matrix.columns[i]
+                col2 = correlation_matrix.columns[j]
+                corr_value = correlation_matrix.iloc[i, j]
+                highly_correlated.append(
+                    f"{col1} ↔ {col2} ({corr_value:.2f})"
+                )
+
+    health_issues = []
+
+    if overall_missing_percentage > 0:
+        health_issues.append("Missing values detected")
+
+    if duplicate_rows > 0:
+        health_issues.append("Duplicate rows detected")
+
+    if len(constant_columns) > 0:
+        health_issues.append("Constant columns detected")
+
+    if len(highly_correlated) > 0:
+        health_issues.append("Highly correlated columns detected")
+
+    if len(health_issues) == 0:
+        dataset_health = "🟢 Excellent"
+        health_message = "No major data quality issues detected."
+    elif len(health_issues) <= 2:
+        dataset_health = "🟡 Moderate"
+        health_message = "Some data quality issues need attention."
+    else:
+        dataset_health = "🔴 Poor"
+        health_message = "Multiple data quality issues detected."
 
     return {
     "rows": rows,
@@ -56,7 +119,17 @@ def generate_dataset_report(df):
     "categorical_columns": categorical_columns,
     "column_types_html": column_types_html,
     "unique_values_html":unique_values_html,
-    "missing_percentage_html": missing_percentage_html}        
+    "missing_percentage_html": missing_percentage_html,
+    "quality_score": quality_score,
+    "missing_status": missing_status,
+    "missing_message": missing_message,
+    "duplicate_status": duplicate_status,
+    "duplicate_message": duplicate_message,
+    "constant_columns": constant_columns,
+    "highly_correlated": highly_correlated,
+    "dataset_health": dataset_health,
+    "health_message": health_message,
+    "health_issues": health_issues}        
 
 @app.route("/")
 def welcome():

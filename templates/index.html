@@ -50,6 +50,52 @@
 
     <p><strong>Duplicate Rows:</strong> {{ report.duplicate_rows }}</p>
 
+    <h3>Dataset Quality Score</h3>
+    <p><strong>{{ report.quality_score }}%</strong></p>
+    
+    <h3>Missing Value Status</h3>
+    <p><strong>Status:</strong> {{ report.missing_status }}</p>
+    <p>{{ report.missing_message }}</p>
+
+    <h3>Duplicate Row Status</h3>
+    <p><strong>Status:</strong> {{ report.duplicate_status }}</p>
+    <p>{{ report.duplicate_message }}</p>
+
+    <h3>Constant Columns</h3>
+    {% if report.constant_columns %}
+        <ul>
+            {% for column in report.constant_columns %}
+                <li>{{ column }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>✅ No constant columns found.</p>
+    {% endif %}
+
+    <h3>Highly Correlated Columns</h3>
+    {% if report.highly_correlated %}
+        <ul>
+            {% for pair in report.highly_correlated %}
+                <li>{{ pair }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>✅ No highly correlated columns found.</p>
+    {% endif %}
+
+    <h3>Dataset Health Summary</h3>
+    <p><strong>Status:</strong> {{ report.dataset_health }}</p>
+    <p>{{ report.health_message }}</p>
+    {% if report.health_issues %}
+    <ul>
+    {% for issue in report.health_issues %}
+            <li>{{ issue }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p>🎉 No data quality issues found.</p>
+    {% endif %}
+
     <h2>Data Cleaning</h2>
     <form action="/remove_duplicates" method="post">
         <button type="submit">
