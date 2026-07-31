@@ -96,6 +96,37 @@
         <p>🎉 No data quality issues found.</p>
     {% endif %}
 
+    <h2>Dataset Overview</h2>
+    <p>{{ report.dataset_overview }}</p>
+
+    <h2>Smart Recommendations</h2>
+    {% if report.recommendations %}
+    <ul>
+        {% for recommendation in report.recommendations %}
+            <li>{{ recommendation }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>🎉 No recommendations. Your dataset is ready for analysis.</p>
+    {% endif %}
+
+    <h2>Suggested Target Column</h2>
+    {% if report.target_column %}
+        <p>{{ report.target_column }}</p>
+    {% else %}
+        <p>No target column could be identified.</p>
+    {% endif %}
+
+    <h2>Machine Learning Readiness</h2>
+    <p><strong>Score:</strong> {{ report.ml_readiness_score }}%</p>
+    <p>{{ report.ml_readiness_message }}</p>
+
+    <form action="/download_report" method="get">
+        <button type="submit">
+            Download Analysis Report
+        </button>
+    </form>
+
     <h2>Data Cleaning</h2>
     <form action="/remove_duplicates" method="post">
         <button type="submit">

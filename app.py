@@ -107,6 +107,80 @@ def generate_dataset_report(df):
         dataset_health = "🔴 Poor"
         health_message = "Multiple data quality issues detected."
 
+    if quality_score >= 90:
+        dataset_condition = "Dataset is in excellent condition."
+
+    elif quality_score >= 70:
+        dataset_condition = "Dataset is in good condition but needs minor cleaning."
+
+    else:
+        dataset_condition = "Dataset requires significant preprocessing before analysis."
+
+    dataset_overview = (
+        f"Dataset contains {rows} rows and {columns} columns. "
+        f"It has {numeric_columns} numeric columns and "
+        f"{categorical_columns} categorical columns. "
+        f"Dataset quality score is {quality_score}%. "
+        f"{dataset_condition}"
+    )
+
+    recommendations = []
+
+    if overall_missing_percentage > 0:
+        recommendations.append(
+            "Fill or remove missing values."
+        )
+
+    if duplicate_rows > 0:
+        recommendations.append(
+            "Remove duplicate rows."
+        )
+
+    if len(constant_columns) > 0:
+        recommendations.append(
+            "Remove constant columns."
+        )
+
+    if len(highly_correlated) > 0:
+        recommendations.append(
+            "Consider removing highly correlated features."
+        )
+
+    if categorical_columns > 0:
+        recommendations.append(
+            "Encode categorical columns before training."
+        )
+
+    target_keywords = [
+    "target",
+    "label",
+    "class",
+    "price",
+    "salary",
+    "income",
+    "churn",
+    "survived",
+    "purchased",
+    "output"
+    ]
+
+    target_column = None
+
+    for column in column_names:
+        if column.lower() in target_keywords:
+            target_column = column
+            break
+
+    ml_readiness_score = quality_score
+    if ml_readiness_score >= 90:
+        ml_readiness_message = "✅ Ready for Machine Learning."
+
+    elif ml_readiness_score >= 70:
+        ml_readiness_message = "⚠️ Minor preprocessing recommended."
+
+    else:
+        ml_readiness_message = "❌ Significant preprocessing required."
+
     return {
     "rows": rows,
     "columns": columns,
@@ -129,7 +203,12 @@ def generate_dataset_report(df):
     "highly_correlated": highly_correlated,
     "dataset_health": dataset_health,
     "health_message": health_message,
-    "health_issues": health_issues}        
+    "health_issues": health_issues,
+    "dataset_overview": dataset_overview,
+    "recommendations": recommendations,
+    "target_column": target_column,
+    "ml_readiness_score": ml_readiness_score,
+    "ml_readiness_message": ml_readiness_message}        
 
 @app.route("/")
 def welcome():
@@ -532,6 +611,77 @@ def download_csv():
         return "Please upload a file first"
 
     return send_file(file_path, as_attachment=True)
+
+@app.route("/download_report")
+def download_report():
+
+    df = pd.read_csv(session["file_path"])
+
+    report = generate_dataset_report(df)
+
+    report_path = "analysis_report.txt"
+
+    with open(report_path, "w", encoding="utf-8") as file:
+
+        file.write("========== DATASENSE AI REPORT ==========\n\n")
+
+        file.write("----- Dataset Summary -----\n")
+        file.write(f"Rows: {report['rows']}\n")
+        file.write(f"Columns: {report['columns']}\n")
+        file.write(f"Memory Usage: {report['memory_usage']}\n")
+        file.write(f"Numeric Columns: {report['numeric_columns']}\n")
+        file.write(f"Categorical Columns: {report['categorical_columns']}\n\n")
+
+        file.write("----- Dataset Quality -----\n")
+        file.write(f"Quality Score: {report['quality_score']}%\n")
+        file.write(f"Missing Status: {report['missing_status']}\n")
+        file.write(f"Duplicate Status: {report['duplicate_status']}\n")
+        file.write(f"Dataset Health: {report['dataset_health']}\n\n")
+
+        file.write("----- Machine Learning -----\n")
+        file.write(f"ML Readiness Score: {report['ml_readiness_score']}%\n")
+        file.write(f"{report['ml_readiness_message']}\n")
+        file.write(f"Suggested Target Column: {report['target_column']}\n\n")
+
+        file.write("----- Dataset Overview -----\n")
+        file.write(f"{report['dataset_overview']}\n\n")
+
+        file.write("----- Recommendations -----\n")
+        if report["recommendations"]:
+            for recommendation in report["recommendations"]:
+                file.write(f"• {recommendation}\n")
+        else:
+            file.write("No recommendations.\n")
+
+        file.write("\n----- Constant Columns -----\n")
+        if report["constant_columns"]:
+            for column in report["constant_columns"]:
+                file.write(f"• {column}\n")
+        else:
+            file.write("None\n")
+
+        file.write("\n----- Highly Correlated Columns -----\n")
+        if report["highly_correlated"]:
+            for pair in report["highly_correlated"]:
+                file.write(f"• {pair}\n")
+        else:
+            file.write("None\n")
+
+        file.write("\n----- Health Issues -----\n")
+        if report["health_issues"]:
+            for issue in report["health_issues"]:
+                file.write(f"• {issue}\n")
+        else:
+            file.write("No issues detected.\n")
+
+        file.write("\n========================================\n")
+        file.write("Generated by DataSense AI\n")
+
+    return send_file(
+        report_path,
+        as_attachment=True,
+        download_name="DataSense_AI_Report.txt"
+    )
 
 if __name__ == "__main__":
     app.run(debug = True, port=5001)
