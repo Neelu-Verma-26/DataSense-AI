@@ -4,31 +4,168 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DataSense AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
 </head>
 <body>
-    <h1>DataSense AI</h1>
-    <h4>AI-Powered Data Quality & Model Monitoring Platform</h4>
-    <h4>Version 0.1</h4>
+    <div class="container">
+    <h1 class="text-center mt-4 text-primary">
+        DataSense AI
+    </h1>
 
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <label for="file">File:</label>
-        <input type="file" name="file">
-        <button type="submit" value="upload">Upload</button>
-    </form>
+    <p class="text-center text-muted">
+        AI-Powered Data Quality & Model Monitoring Platform
+    </p>
+
+    <p class="text-center text-secondary">
+        Version 0.1
+    </p>
+
+    <div class="card mt-4 shadow-sm">
+        <div class="card-header bg-dark text-white">
+            Upload Dataset
+        </div>
+        <div class="card-body">
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="file" class="form-label">
+                        Choose CSV File
+                    </label>
+                    <input
+                        type="file"
+                        class="form-control"
+                        id="file"
+                        name="file">
+                </div>
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+                    Upload Dataset
+                </button>
+            </form>
+        </div>
+    </div>
 
     {% if report %}
 
     <hr>
-    <h2>Dataset Preview</h2>
-    {{ report.table| safe }}
+    <div class="card mt-4 shadow-sm">
+        <div class="card-header bg-dark text-white">
+            Dataset Preview
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                {{ report.table | safe }}
+            </div>
+        </div>
+    </div>
 
-    <h2>Dataset summary</h2>
-    <p><strong>Rows:</strong> {{ report.rows }}</p>
-    <p><strong>Columns:</strong> {{ report.columns }}</p>
-    <p><strong>Memory Usage:</strong> {{ report.memory_usage }}</p>
-    <p><strong>Numeric Columns:</strong> {{ report.numeric_columns }}</p>
-    <p><strong>Categorical Columns:</strong> {{ report.categorical_columns }}</p>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    Dataset Summary
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Rows:</strong> {{ report.rows }}</p>
+                    <p class="mb-2"><strong>Columns:</strong> {{ report.columns }}</p>
+                    <p class="mb-2"><strong>Memory Usage:</strong> {{ report.memory_usage }}</p>
+                    <p class="mb-2"><strong>Numeric Columns:</strong> {{ report.numeric_columns }}</p>
+                    <p class="mb-2"><strong>Categorical Columns:</strong> {{ report.categorical_columns }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    Dataset Health
+                </div>
+                <div class="card-body">
+                    <p><strong>Status:</strong> {{ report.dataset_health }}</p>
+                    <p>{{ report.health_message }}</p>
+                    {% if report.health_issues %}
+                    <ul>
+                    {% for issue in report.health_issues %}
+                            <li>{{ issue }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                        <p>🎉 No data quality issues found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+        
     
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-info text-white">
+                    Dataset Overview
+                </div>
+                <div class="card-body">
+                    <p>{{ report.dataset_overview }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    Machine Learning Readiness
+                </div>
+                <div class="card-body">
+                    <p><strong>Score:</strong> {{ report.ml_readiness_score }}%</p>
+                    <p>{{ report.ml_readiness_message }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    Smart Recommendations
+                </div>
+                <div class="card-body">
+                    {% if report.recommendations %}
+                    <ul>
+                        {% for recommendation in report.recommendations %}
+                            <li>{{ recommendation }}</li>
+                        {% endfor %} 
+                    </ul>
+                    {% else %}
+                    <p>🎉 No recommendations. Your dataset is ready for analysis.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-info text-white">
+                    Suggested Target Column
+                </div>
+
+                <div class="card-body">
+
+                    {% if report.target_column %}
+                    <p>{{ report.target_column }}</p>
+                    {% else %}
+                    <p>No target column could be identified.</p>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <h3>Column Names:</h3>
     <ul>
         {% for column in report.column_names %}
@@ -83,44 +220,6 @@
         <p>✅ No highly correlated columns found.</p>
     {% endif %}
 
-    <h3>Dataset Health Summary</h3>
-    <p><strong>Status:</strong> {{ report.dataset_health }}</p>
-    <p>{{ report.health_message }}</p>
-    {% if report.health_issues %}
-    <ul>
-    {% for issue in report.health_issues %}
-            <li>{{ issue }}</li>
-        {% endfor %}
-    </ul>
-    {% else %}
-        <p>🎉 No data quality issues found.</p>
-    {% endif %}
-
-    <h2>Dataset Overview</h2>
-    <p>{{ report.dataset_overview }}</p>
-
-    <h2>Smart Recommendations</h2>
-    {% if report.recommendations %}
-    <ul>
-        {% for recommendation in report.recommendations %}
-            <li>{{ recommendation }}</li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>🎉 No recommendations. Your dataset is ready for analysis.</p>
-    {% endif %}
-
-    <h2>Suggested Target Column</h2>
-    {% if report.target_column %}
-        <p>{{ report.target_column }}</p>
-    {% else %}
-        <p>No target column could be identified.</p>
-    {% endif %}
-
-    <h2>Machine Learning Readiness</h2>
-    <p><strong>Score:</strong> {{ report.ml_readiness_score }}%</p>
-    <p>{{ report.ml_readiness_message }}</p>
-
     <form action="/download_report" method="get">
         <button type="submit">
             Download Analysis Report
@@ -129,7 +228,7 @@
 
     <h2>Data Cleaning</h2>
     <form action="/remove_duplicates" method="post">
-        <button type="submit">
+        <button type="submit" class="btn btn-danger me-2 mb-2">
             Remove Duplicate Rows
         </button>
     </form>
@@ -137,7 +236,7 @@
     <br>
 
     <form action="/remove_missing_rows" method="post">
-        <button type="submit">
+        <button type="submit" class="btn btn-warning me-2 mb-2">
             Remove Missing Rows
         </button>
     </form>
@@ -145,7 +244,7 @@
     <br>
 
     <form action="/fill_mean" method="post">
-        <button type="submit">
+        <button type="submit" class="btn btn-success me-2 mb-2">
             Fill Missing Values with Mean
         </button>
     </form>
@@ -153,7 +252,7 @@
     <br>
 
     <form action="/fill_median" method="post">
-        <button type="submit">
+        <button type="submit" class="btn btn-success me-2 mb-2">
             Fill Missing Values with Median
         </button>
     </form>
@@ -161,7 +260,7 @@
     <br>
 
     <form action="/fill_mode" method="post">
-        <button type="submit">
+        <button type="submit" class="btn btn-success me-2 mb-2">
             Fill Missing Values with Mode
         </button>
     </form>
@@ -169,13 +268,15 @@
     <br>
 
     <form action="/download_csv" method="get">
-        <button type="submit">Download Cleaned CSV</button>
+        <button type="submit" class="btn btn-primary me-2 mb-2">
+            Download Cleaned CSV
+        </button>
     </form>
 
     <br>
 
     <form action="/show_statistics" method="post">
-        <button type="submit">
+        <button type="submit" class="btn btn-info me-2 mb-2">
             Show Statistics
         </button>
     </form>
@@ -351,5 +452,15 @@
     {% endif %}
 
     <p>Project Under Development</p>
+    <footer class="bg-dark text-white text-center p-3 mt-5">
+        <h5>DataSense AI</h5>
+        <p class="mb-1">
+            AI-Powered Data Quality & Model Monitoring Platform
+        </p>
+        <p class="mb-0">
+            Version 0.1 | Developed by Neelu Verma
+        </p>
+    </footer>
+</div>
 </body>
 </html>

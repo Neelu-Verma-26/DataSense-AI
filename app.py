@@ -16,7 +16,9 @@ def generate_dataset_report(df):
     if missing_values.empty:
             missing_values_html = "<p>No Missing Values found</p>"
     else:
-            missing_values_html = (missing_values.to_frame(name="Missing Values").to_html())
+            missing_values_html = (missing_values.to_frame(name="Missing Values").to_html(
+    classes="table table-striped table-hover table-bordered",
+    index=False))
 
     duplicate_rows = df.duplicated().sum()
     if duplicate_rows == 0:
@@ -27,7 +29,10 @@ def generate_dataset_report(df):
         duplicate_status = "🟡 Warning"
         duplicate_message = f"{duplicate_rows} duplicate rows found."
 
-    table = df.head().to_html()
+    table = df.head().to_html(
+        classes="table table-striped table-hover table-bordered",
+        index=False
+    )
 
     memory = df.memory_usage().sum()
 
@@ -43,14 +48,23 @@ def generate_dataset_report(df):
     categorical_columns = categorical_df.shape[1]
 
     column_types = df.dtypes
-    column_types_html = column_types.to_frame(name="Data Type").to_html()
+    column_types_html = column_types.to_frame(name="Data Type").to_html(
+    classes="table table-striped table-hover table-bordered",
+    index=False
+)
 
     unique_values = df.nunique()
-    unique_values_html = unique_values.to_frame(name="Unique Values").to_html()
+    unique_values_html = unique_values.to_frame(name="Unique Values").to_html(
+    classes="table table-striped table-hover table-bordered",
+    index=False
+)
     constant_columns = unique_values[unique_values == 1].index.tolist()
 
     missing_percentage = (missing_values / rows) * 100
-    missing_percentage_html = missing_percentage.to_frame(name="Missing Percentage (%)").to_html()
+    missing_percentage_html = missing_percentage.to_frame(name="Missing Percentage (%)").to_html(
+    classes="table table-striped table-hover table-bordered",
+    index=False
+)
 
     total_missing = missing_values.sum()
     overall_missing_percentage = (total_missing / (rows * columns)) * 100
@@ -371,12 +385,13 @@ def show_histogram():
     df = pd.read_csv(file_path)
 
     column_data = df[selected_column]
-    plt.figure(figsize=(8,5))
+    plt.figure(figsize=(10,6))
     plt.hist(column_data, bins=20)
-    plt.title(f"Histogram of {selected_column}")
-    plt.xlabel(selected_column)
-    plt.ylabel("Frequency")
+    plt.title(f"Histogram of {selected_column}", fontsize=16)
+    plt.xlabel(selected_column, fontsize=12)
+    plt.ylabel("Frequency", fontsize=12)
     plt.grid(True)
+    plt.tight_layout()
     plt.savefig("static/histogram.png")
     plt.close()
 
@@ -395,11 +410,12 @@ def show_boxplot():
     
     df = pd.read_csv(file_path)
     column_data = df[selected_column]
-    plt.figure(figsize=(8,5))
+    plt.figure(figsize=(10,6))
     plt.boxplot(column_data)
-    plt.title(f"Box Plot of {selected_column}")
-    plt.ylabel(selected_column)
+    plt.title(f"Box Plot of {selected_column}", fontsize=16)
+    plt.ylabel(selected_column, fontsize=12)
     plt.grid(True)
+    plt.tight_layout()
     plt.savefig("static/boxplot.png")
     plt.close()
 
@@ -433,11 +449,12 @@ def show_scatter():
     x_data = df[x_column]
     y_data = df[y_column]
 
-    plt.figure(figsize=(8,5))
+    plt.figure(figsize=(10,6))
     plt.scatter(x_data, y_data)
-    plt.title(f"Scatter Plot of {x_column} vs {y_column}")
-    plt.xlabel(x_column)
-    plt.ylabel(y_column)
+    plt.title(f"Scatter Plot of {x_column} vs {y_column}", fontsize=16)
+    plt.xlabel(x_column, fontsize=12)
+    plt.ylabel(y_column, fontsize=12)
+    plt.tight_layout()
     plt.savefig("static/scatter.png")
     plt.close()
 
@@ -470,7 +487,8 @@ def show_heatmap():
     plt.figure(figsize=(10,8))
     sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm")
     plt.tight_layout()
-    plt.title("Correlation Heatmap")
+    plt.title("Correlation Heatmap", fontsize=16)
+    plt.tight_layout()
     plt.savefig("static/heatmap.png")
     plt.close()
 
@@ -493,11 +511,11 @@ def show_barchart():
     selected_column = request.form["bar_column"]
 
     counts = df[selected_column].value_counts()
-    plt.figure(figsize=(8,5))
+    plt.figure(figsize=(10,6))
     plt.bar(counts.index, counts.values)
-    plt.title(f"Bar Chart of {selected_column}")
-    plt.xlabel(selected_column)
-    plt.ylabel("Count")
+    plt.title(f"Bar Chart of {selected_column}", fontsize=16)
+    plt.xlabel(selected_column, fontsize=12)
+    plt.ylabel("Count", fontsize=12)
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.savefig("static/barchart.png")
@@ -539,11 +557,11 @@ def show_linechart():
     x_data = df[x_column]
     y_data = df[y_column]
 
-    plt.figure(figsize=(8,5))
+    plt.figure(figsize=(10,6))
     plt.plot(x_data, y_data)
-    plt.title(f"Line Chart of {x_column} vs {y_column}")
-    plt.xlabel(x_column)
-    plt.ylabel(y_column)
+    plt.title(f"Line Chart of {x_column} vs {y_column}", fontsize=16)
+    plt.xlabel(x_column, fontsize=12)
+    plt.ylabel(y_column, fontsize=12)
     plt.tight_layout()
     plt.savefig("static/linechart.png")
     plt.close()
@@ -584,10 +602,11 @@ def show_piechart():
         )
 
     counts = df[selected_column].value_counts(dropna=False)
-    plt.figure(figsize=(8,5))
+    plt.figure(figsize=(10,6))
     plt.pie(counts.values, labels=counts.index,  autopct="%1.1f%%")
-    plt.title(f"Pie Chart of {selected_column}")
+    plt.title(f"Pie Chart of {selected_column}", fontsize=16)
     plt.axis("equal") 
+    plt.xticks(rotation=45)
     plt.tight_layout()
     plt.savefig("static/piechart.png")
     plt.close()
