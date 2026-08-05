@@ -25,7 +25,7 @@
         <div class="card-header bg-dark text-white">
             Upload Dataset
         </div>
-        <div class="card-body">
+        <div class="card-body p-4">
             <form action="/upload" method="post" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label for="file" class="form-label">
@@ -48,12 +48,12 @@
 
     {% if report %}
 
-    <hr>
+    <hr class="my-4">
     <div class="card mt-4 shadow-sm">
         <div class="card-header bg-dark text-white">
             Dataset Preview
         </div>
-        <div class="card-body">
+        <div class="card-body p-4">
             <div class="table-responsive">
                 {{ report.table | safe }}
             </div>
@@ -62,11 +62,11 @@
 
     <div class="row mt-4">
         <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow rounded-4">
                 <div class="card-header bg-primary text-white">
                     Dataset Summary
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     <p class="mb-2"><strong>Rows:</strong> {{ report.rows }}</p>
                     <p class="mb-2"><strong>Columns:</strong> {{ report.columns }}</p>
                     <p class="mb-2"><strong>Memory Usage:</strong> {{ report.memory_usage }}</p>
@@ -77,11 +77,11 @@
         </div>
 
         <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow rounded-4">
                 <div class="card-header bg-success text-white">
                     Dataset Health
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     <p><strong>Status:</strong> {{ report.dataset_health }}</p>
                     <p>{{ report.health_message }}</p>
                     {% if report.health_issues %}
@@ -97,27 +97,25 @@
             </div>
         </div>
     </div>
-        
-    
 
     <div class="row mt-4">
         <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow rounded-4">
                 <div class="card-header bg-info text-white">
                     Dataset Overview
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     <p>{{ report.dataset_overview }}</p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow rounded-4">
                 <div class="card-header bg-warning text-dark">
                     Machine Learning Readiness
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     <p><strong>Score:</strong> {{ report.ml_readiness_score }}%</p>
                     <p>{{ report.ml_readiness_message }}</p>
                 </div>
@@ -128,11 +126,11 @@
     
     <div class="row mt-4">
         <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
-                <div class="card-header bg-primary text-white">
+            <div class="card h-100 shadow rounded-4">
+                <div class="card-header bg-info text-white">
                     Smart Recommendations
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     {% if report.recommendations %}
                     <ul>
                         {% for recommendation in report.recommendations %}
@@ -147,12 +145,12 @@
         </div>
 
         <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow rounded-4">
                 <div class="card-header bg-info text-white">
                     Suggested Target Column
                 </div>
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
                     {% if report.target_column %}
                     <p>{{ report.target_column }}</p>
@@ -165,293 +163,356 @@
         </div>
     </div>
 
+    <div class="card mt-4 shadow-sm rounded-4">
+        <div class="card-header bg-info text-white">
+            Column Names
+        </div>
+        <div class="card-body p-4">
+            <ul>
+                {% for column in report.column_names %}
+                    <li>{{ column }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 
-    <h3>Column Names:</h3>
-    <ul>
-        {% for column in report.column_names %}
-            <li>{{ column }}</li>
-        {% endfor %}
-    </ul>
+    <div class="card mt-4 shadow-sm rounded-4">
+        <div class="card-header bg-info text-white">
+            Column Data Types
+        </div>
+        <div class="card-body p-4">
+            {{ report.column_types_html|safe }}
+        </div>
+    </div>
 
-    <h3>Column Data Types</h3>
-    {{ report.column_types_html | safe }}
-
-    <h3>Unique Values</h3>
-    {{ report.unique_values_html | safe }}
-
-    <h2>Missing Values</h2>
-    {{ report.missing_values_html | safe }}
+    <div class="card mt-4 shadow-sm rounded-4">
+        <div class="card-header bg-info text-white">
+            Unique Values
+        </div>
+        <div class="card-body p-4">
+            {{ report.unique_values_html | safe }}
+        </div>
+    </div>
     
-    <h3>Missing Percentage</h3>
-    {{ report.missing_percentage_html | safe }}
+    <div class="card mt-4 shadow-sm rounded-4">
+        <div class="card-header bg-info text-white">
+            Missing Values
+        </div>
+        <div class="card-body p-4">
+            {{ report.missing_values_html | safe }}
+        </div>
+    </div>
 
-    <p><strong>Duplicate Rows:</strong> {{ report.duplicate_rows }}</p>
+    <div class="card mt-4 shadow-sm rounded-4">
+        <div class="card-header bg-info text-white">
+            Missing Percentage
+        </div>
+        <div class="card-body p-4">
+            {{ report.missing_percentage_html | safe }}
+        </div>
+    </div>
 
-    <h3>Dataset Quality Score</h3>
-    <p><strong>{{ report.quality_score }}%</strong></p>
+    <div class="card mt-4 shadow-sm rounded-4">
+        <div class="card-header bg-dark text-white">
+            Data Quality Analysis   
+        </div>
+        <div class="card-body p-4">
+            <p><strong>Duplicate Rows:</strong> {{ report.duplicate_rows }}</p>
+            <hr class="my-4">
+
+            <h5 class="mt-3">Dataset Quality Score</h5>
+            <p> {{ report.quality_score }}%</p>
+            <hr class="my-4">
+            
+            <h5 class="mt-3">Missing Value Status</h5>
+            <p><strong>Missing Value Status:</strong> {{ report.missing_status }}</p>
+            <p>{{ report.missing_message }}</p>
+            <hr class="my-4">
+
+            <h5 class="mt-3">Duplicate Row Status</h5>
+            <p><strong>Duplicate Row Status:</strong> {{ report.duplicate_status }}</p>
+            <p>{{ report.duplicate_message }}</p>
+            <hr class="my-4">
+
+            <h5 class="mt-3">Constant Columns</h5>
+            {% if report.constant_columns %}
+                <ul>
+                    {% for column in report.constant_columns %}
+                        <li>{{ column }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>✅ No constant columns found.</p>
+            {% endif %}
+            <hr class="my-4">
+
+            <h5 class="mt-3">Highly Correlated Columns</h5>
+            {% if report.highly_correlated %}
+                <ul>
+                    {% for pair in report.highly_correlated %}
+                        <li>{{ pair }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>✅ No highly correlated columns found.</p>
+            {% endif %}  
+        </div>
+    </div>
     
-    <h3>Missing Value Status</h3>
-    <p><strong>Status:</strong> {{ report.missing_status }}</p>
-    <p>{{ report.missing_message }}</p>
-
-    <h3>Duplicate Row Status</h3>
-    <p><strong>Status:</strong> {{ report.duplicate_status }}</p>
-    <p>{{ report.duplicate_message }}</p>
-
-    <h3>Constant Columns</h3>
-    {% if report.constant_columns %}
-        <ul>
-            {% for column in report.constant_columns %}
-                <li>{{ column }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>✅ No constant columns found.</p>
-    {% endif %}
-
-    <h3>Highly Correlated Columns</h3>
-    {% if report.highly_correlated %}
-        <ul>
-            {% for pair in report.highly_correlated %}
-                <li>{{ pair }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>✅ No highly correlated columns found.</p>
-    {% endif %}
 
     <form action="/download_report" method="get">
-        <button type="submit">
+        <button type="submit" class="btn btn-dark me-2 mb-2">
             Download Analysis Report
         </button>
     </form>
 
-    <h2>Data Cleaning</h2>
-    <form action="/remove_duplicates" method="post">
-        <button type="submit" class="btn btn-danger me-2 mb-2">
-            Remove Duplicate Rows
-        </button>
-    </form>
 
-    <br>
+    <div class="card mt-4 shadow-sm rounded-4">
+        <div class="card-header bg-dark text-white">
+            Data Cleaning
+        </div>
+        <div class="card-body p-4">
+            <form action="/remove_duplicates" method="post">
+                <button type="submit" class="btn btn-danger me-2 mb-2">
+                    Remove Duplicate Rows
+                </button>
+            </form>
+            <hr class="my-4">
+            <form action="/remove_missing_rows" method="post">
+                <button type="submit" class="btn btn-warning me-2 mb-2">
+                    Remove Missing Rows
+                </button>
+            </form>
+            <hr class="my-4">
+            <form action="/fill_mean" method="post">
+                <button type="submit" class="btn btn-success me-2 mb-2">
+                    Fill Missing Values with Mean
+                </button>
+            </form>
+            <hr class="my-4">
+            <form action="/fill_median" method="post">
+                <button type="submit" class="btn btn-success me-2 mb-2">
+                    Fill Missing Values with Median
+                </button>
+            </form>
+            <hr class="my-4">
+            <form action="/fill_mode" method="post">
+                <button type="submit" class="btn btn-success me-2 mb-2">
+                    Fill Missing Values with Mode
+                </button>
+            </form>
+        </div>
+    </div>
 
-    <form action="/remove_missing_rows" method="post">
-        <button type="submit" class="btn btn-warning me-2 mb-2">
-            Remove Missing Rows
-        </button>
-    </form>
 
-    <br>
+    <div class="card mt-4 shadow-sm rounded-4">
+        <div class="card-header bg-dark text-white">
+            Statistics
+        </div>
+        <div class="card-body p-4">
+            <h5 class="mt-3">Mean</h5>
+            {{ mean_html|safe }}
+            <hr class="my-4">
 
-    <form action="/fill_mean" method="post">
-        <button type="submit" class="btn btn-success me-2 mb-2">
-            Fill Missing Values with Mean
-        </button>
-    </form>
+            <h5 class="mt-3">Median</h5>
+            {{ median_html|safe }}
+            <hr class="my-4">
 
-    <br>
+            <h5 class="mt-3">Mode</h5>
+            {{ mode_html|safe }}
+            <hr class="my-4">
 
-    <form action="/fill_median" method="post">
-        <button type="submit" class="btn btn-success me-2 mb-2">
-            Fill Missing Values with Median
-        </button>
-    </form>
+            <h5 class="mt-3">Minimum</h5>
+            {{ min_html|safe }}
+            <hr class="my-4">
 
-    <br>
+            <h5 class="mt-3">Maximum</h5>
+            {{ max_html|safe }}
+            <hr class="my-4">
 
-    <form action="/fill_mode" method="post">
-        <button type="submit" class="btn btn-success me-2 mb-2">
-            Fill Missing Values with Mode
-        </button>
-    </form>
+            <h5 class="mt-3">Standard Deviation</h5>
+            {{ std_html|safe }}
+            <hr class="my-4">
 
-    <br>
-
-    <form action="/download_csv" method="get">
-        <button type="submit" class="btn btn-primary me-2 mb-2">
-            Download Cleaned CSV
-        </button>
-    </form>
-
-    <br>
-
-    <form action="/show_statistics" method="post">
-        <button type="submit" class="btn btn-info me-2 mb-2">
-            Show Statistics
-        </button>
-    </form>
-
-    <h3>Mean</h3>
-    {{ mean_html|safe }}
-
-    <h3>Median</h3>
-    {{ median_html|safe }}
-
-    <h3>Mode</h3>
-    {{ mode_html|safe }}
-
-    <h3>Minimum</h3>
-    {{ min_html|safe }}
-
-    <h3>Maximum</h3>
-    {{ max_html|safe }}
-
-    <h3>Standard Deviation</h3>
-    {{ std_html|safe }}
-
-    <h3>Variance</h3>
-    {{ variance_html|safe }}
-
-    <h2>Data Visualisation</h2>
-    <form action="/show_histogram" method="post">
-        <label for="column">Select Column:</label>
-        <select name="column" id="column">
-            {% for column in report.column_names %}
-                <option value="{{ column }}">
-                    {{ column }}
-                </option>
-            {% endfor %} 
-        </select>
-        <button type="submit">Show Histogram</button>
-    </form>
-    {% if histogram_image %}
-        <h3>Histogram</h3>
-        <img src="{{ url_for('static', filename=histogram_image) }}", alt="Histogram">
-    {% endif %}
-
-    <hr>
-    <form action="/show_boxplot" method="post">
-        <label for="box_column">Select Column:</label>
-        <select name="column" id="box_column">
-            {% for column in report.column_names %}
-                <option value="{{ column }}">
-                    {{ column }}
-                </option>
-            {% endfor %}
-        </select>
-        <button type="submit">Show Box Plot</button>
-    </form>
-    {% if boxplot_image %}
-        <h3>Box Plot</h3>
-        <img src="{{ url_for('static', filename=boxplot_image) }}" alt="Box Plot">
-    {% endif %}
-
-    <hr>
-    {% if error %}
-        <p style="color:red;">{{ error }}</p>
-    {% endif %}
-
-    <form action="/show_scatter" method="post">
-        <label for="x_column">Select X-axis: </label>
-        <select name="x_column" id="x_column">
-            {% for column in report.column_names %}
-                <option value="{{ column }}">
-                    {{ column }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <label for="y_column">Select Y-axis: </label>
-        <select name="y_column" id="y_column">
-            {% for column in report.column_names %}
-                <option value="{{ column }}">
-                    {{ column }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <button type="submit">Show Scatter Plot</button>
-    </form>
-
-    {% if scatter_image %}
-        <h3>Scatter Plot</h3>
-        <img src="{{ url_for('static', filename=scatter_image) }}" alt="Scatter Plot">
-    {% endif %}
-
-    <hr>
-    <form action="/show_heatmap" method="post">
-        <button type="submit">Show Heatmap</button>
-    </form>
-
-    {% if heatmap_image %}
-        <h3>Correlation Heatmap</h3>
-        <img src="{{ url_for('static', filename=heatmap_image) }}" alt="Correlation Heatmap">
-    {% endif %}
-
-    <hr>
-    <form action="/show_barchart" method="post">
-        <label for="bar_column">Select Column:</label>
-        <select name="bar_column" id="bar_column">
-            {% for column in report.column_names %}
-            <option value="{{ column }}">
-                {% if column == selected_bar_column %}selected{% endif %}>
-                {{ column }}
-            </option>
-            {% endfor %}
-        </select>
-        <button type="submit">Show Bar Chart</button>
-    </form>
-
-    {% if barchart_image %}
-        <h3>Bar Chart</h3>
-        <img src="{{ url_for('static', filename=barchart_image) }}" alt="Bar Chart">
-    {% endif %}
-
-    <hr>
-    {% if line_error %}
-        <p style="color:red;">{{ line_error }}</p>
-    {% endif %}
-    <form action="/show_linechart" method="post">
-        <label for="x_column">Select X-axis: </label>
-        <select name="x_column" id="x_column">
-            {% for column in report.column_names %}
-                <option value="{{ column }}">
-                    {{ column }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <label for="y_column">Select Y-axis: </label>
-        <select name="y_column" id="y_column">
-            {% for column in report.column_names %}
-                <option value="{{ column }}">
-                    {{ column }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <button type="submit">Show Line Chart</button>
-    </form>
-    {% if linechart_image %}
-        <h3>Line Chart</h3>
-        <img src="{{ url_for('static', filename=linechart_image) }}" alt="Line Chart">
-    {% endif %}
-
-    <hr>
-    {% if pie_error %}
-    <p style="color:red;">{{ pie_error }}</p>
-    {% endif %}
-    <form action="/show_piechart" method="post">
-        <label for="pie_column">Select Column:</label>
-        <select name="pie_column" id="pie_column">
-            {% for column in report.column_names %}
-            <option value="{{ column }}">
-                {% if column == selected_pie_column %}selected{% endif %}>
-                {{ column }}
-            </option>
-            {% endfor %}
-        </select>
-        <button type="submit">Show Pie Chart</button>
-    </form>
-
-    {% if piechart_image %}
-    <h3>Pie Chart</h3>
-    <img src="{{ url_for('static', filename=piechart_image) }}" alt="Pie Chart">
-    {% endif %}
+            <h5 class="mt-3">Variance</h5>
+            {{ variance_html|safe }}
+            <hr class="my-4">
+        </div>
+    </div>
     
-    {% endif %}
+    <div class="card mt-4 shadow-sm rounded-4">
+        <div class="card-header bg-info text-white">
+            Downloads
+        </div>
+        <div class="card-body p-4">
+            <form action="/download_csv" method="get">
+                <button type="submit" class="btn btn-primary me-2 mb-2">
+                    Download Cleaned CSV
+                </button>
+            </form>
+        </div>
+    </div>
+    <br>
 
-    <p>Project Under Development</p>
+    <div class="card mt-4 shadow-sm rounded-4">
+        <div class="card-header bg-info text-white">
+            Data Visualization
+        </div>
+        <div class="card-body p-4">
+            <form action="/show_histogram" method="post">
+                <label for="column" class="form-label">Select Column:</label>
+                <select class="form-select" name="column" id="column">
+                    {% for column in report.column_names %}
+                        <option value="{{ column }}">
+                            {{ column }}
+                        </option>
+                    {% endfor %} 
+                </select>
+                <button type="submit" class="btn btn-info me-2 mb-2">Show Histogram</button>
+            </form>
+            {% if histogram_image %}
+                <h3>Histogram</h3>
+                <img src="{{ url_for('static', filename=histogram_image) }}" class="img-fluid rounded shadow-sm" alt="Histogram">
+            {% endif %}
+
+            <hr class="my-4">
+            <form action="/show_boxplot" method="post">
+                <label for="box_column" class="form-label">Select Column:</label>
+                <select class="form-select" name="column" id="box_column">
+                    {% for column in report.column_names %}
+                        <option value="{{ column }}">
+                            {{ column }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-info me-2 mb-2">Show Box Plot</button>
+            </form>
+            {% if boxplot_image %}
+                <h3>Box Plot</h3>
+                <img src="{{ url_for('static', filename=boxplot_image) }}" class="img-fluid rounded shadow-sm" alt="Box Plot">
+            {% endif %}
+
+            <hr class="my-4">
+            {% if error %}
+                <p style="color:red;">{{ error }}</p>
+            {% endif %}
+
+            <form action="/show_scatter" method="post">
+                <label for="x_column" class="form-label">Select X-axis: </label>
+                <select class="form-select" name="x_column" id="x_column">
+                    {% for column in report.column_names %}
+                        <option value="{{ column }}">
+                            {{ column }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label for="y_column" class="form-label">Select Y-axis: </label>
+                <select class="form-select" name="y_column" id="y_column">
+                    {% for column in report.column_names %}
+                        <option value="{{ column }}">
+                            {{ column }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="btn btn-info me-2 mb-2">Show Scatter Plot</button>
+            </form>
+
+            {% if scatter_image %}
+                <h3>Scatter Plot</h3>
+                <img src="{{ url_for('static', filename=scatter_image) }}" class="img-fluid rounded shadow-sm" alt="Scatter Plot">
+            {% endif %}
+
+            <hr class="my-4">
+            <form action="/show_heatmap" method="post">
+                <button type="submit" class="btn btn-info me-2 mb-2">Show Heatmap</button>
+            </form>
+
+            {% if heatmap_image %}
+                <h3>Correlation Heatmap</h3>
+                <img src="{{ url_for('static', filename=heatmap_image) }}" class="img-fluid rounded shadow-sm"   alt="Correlation Heatmap">
+            {% endif %}
+
+            <hr class="my-4">
+            <form action="/show_barchart" method="post">
+                <label for="bar_column" class="form-label">Select Column:</label>
+                <select class="form-select" name="bar_column" id="bar_column">
+                    {% for column in report.column_names %}
+                    <option value="{{ column }}">
+                        {% if column == selected_bar_column %}selected{% endif %}>
+                        {{ column }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-info me-2 mb-2">Show Bar Chart</button>
+            </form>
+
+            {% if barchart_image %}
+                <h3>Bar Chart</h3>
+                <img src="{{ url_for('static', filename=barchart_image) }}" class="img-fluid rounded shadow-sm" alt="Bar Chart">
+            {% endif %}
+
+            <hr class="my-4">
+            {% if line_error %}
+                <p style="color:red;">{{ line_error }}</p>
+            {% endif %}
+            <form action="/show_linechart" method="post">
+                <label for="x_column" class="form-label">Select X-axis: </label>
+                <select class="form-select" name="x_column" id="x_column">
+                    {% for column in report.column_names %}
+                        <option value="{{ column }}">
+                            {{ column }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label for="y_column" class="form-label">Select Y-axis: </label>
+                <select class="form-select" name="y_column" id="y_column">
+                    {% for column in report.column_names %}
+                        <option value="{{ column }}">
+                            {{ column }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="btn btn-info me-2 mb-2">Show Line Chart</button>
+            </form>
+            {% if linechart_image %}
+                <h3>Line Chart</h3>
+                <img src="{{ url_for('static', filename=linechart_image) }}" class="img-fluid rounded shadow-sm" alt="Line Chart">
+            {% endif %}
+
+            <hr class="my-4">
+            {% if pie_error %}
+            <p style="color:red;">{{ pie_error }}</p>
+            {% endif %}
+            <form action="/show_piechart" method="post">
+                <label for="pie_column" class="form-label">Select Column:</label>
+                <select class="form-select" name="pie_column" id="pie_column">
+                    {% for column in report.column_names %}
+                    <option value="{{ column }}">
+                        {% if column == selected_pie_column %}selected{% endif %}>
+                        {{ column }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-info me-2 mb-2">Show Pie Chart</button>
+            </form>
+
+            {% if piechart_image %}
+            <h3>Pie Chart</h3>
+            <img src="{{ url_for('static', filename=piechart_image) }}" class="img-fluid rounded shadow-sm" alt="Pie Chart">
+            {% endif %}
+            
+            {% endif %}
+        </div>
+    </div>
+   
+    <p class="text-center text-muted mt-4 fst-italic">
+        🚧 Project Under Development
+    </p>
+
     <footer class="bg-dark text-white text-center p-3 mt-5">
         <h5>DataSense AI</h5>
         <p class="mb-1">
