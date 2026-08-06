@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, session, send_file
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 
 app = Flask(__name__)
 app.secret_key =  "datasense_ai_secret_key"
@@ -703,4 +704,8 @@ def download_report():
     )
 
 if __name__ == "__main__":
-    app.run(debug = True, port=5001)
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5001)),
+        debug=True
+    )

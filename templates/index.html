@@ -9,15 +9,15 @@
 </head>
 <body>
     <div class="container">
-    <h1 class="text-center mt-4 text-primary">
+    <h1 class="display-4 fw-bold text-center mt-4 text-primary">
         DataSense AI
     </h1>
 
-    <p class="text-center text-muted">
+    <p class="lead text-center text-secondary">
         AI-Powered Data Quality & Model Monitoring Platform
     </p>
 
-    <p class="text-center text-secondary">
+    <p class="text-center text-secondary fst-italic">
         Version 0.1
     </p>
 
@@ -78,7 +78,7 @@
 
         <div class="col-md-6">
             <div class="card h-100 shadow rounded-4">
-                <div class="card-header bg-success text-white">
+                <div class="card-header bg-primary text-white">
                     Dataset Health
                 </div>
                 <div class="card-body p-4">
@@ -101,7 +101,7 @@
     <div class="row mt-4">
         <div class="col-md-6">
             <div class="card h-100 shadow rounded-4">
-                <div class="card-header bg-info text-white">
+                <div class="card-header bg-primary text-white">
                     Dataset Overview
                 </div>
                 <div class="card-body p-4">
@@ -112,7 +112,7 @@
 
         <div class="col-md-6">
             <div class="card h-100 shadow rounded-4">
-                <div class="card-header bg-warning text-dark">
+                <div class="card-header bg-primary text-white">
                     Machine Learning Readiness
                 </div>
                 <div class="card-body p-4">
@@ -127,7 +127,7 @@
     <div class="row mt-4">
         <div class="col-md-6">
             <div class="card h-100 shadow rounded-4">
-                <div class="card-header bg-info text-white">
+                <div class="card-header bg-primary text-white">
                     Smart Recommendations
                 </div>
                 <div class="card-body p-4">
@@ -146,7 +146,7 @@
 
         <div class="col-md-6">
             <div class="card h-100 shadow rounded-4">
-                <div class="card-header bg-info text-white">
+                <div class="card-header bg-primary text-white">
                     Suggested Target Column
                 </div>
 
@@ -164,7 +164,7 @@
     </div>
 
     <div class="card mt-4 shadow-sm rounded-4">
-        <div class="card-header bg-info text-white">
+        <div class="card-header bg-primary text-white">
             Column Names
         </div>
         <div class="card-body p-4">
@@ -177,7 +177,7 @@
     </div>
 
     <div class="card mt-4 shadow-sm rounded-4">
-        <div class="card-header bg-info text-white">
+        <div class="card-header bg-primary text-white">
             Column Data Types
         </div>
         <div class="card-body p-4">
@@ -186,7 +186,7 @@
     </div>
 
     <div class="card mt-4 shadow-sm rounded-4">
-        <div class="card-header bg-info text-white">
+        <div class="card-header bg-primary text-white">
             Unique Values
         </div>
         <div class="card-body p-4">
@@ -195,7 +195,7 @@
     </div>
     
     <div class="card mt-4 shadow-sm rounded-4">
-        <div class="card-header bg-info text-white">
+        <div class="card-header bg-primary text-white">
             Missing Values
         </div>
         <div class="card-body p-4">
@@ -204,7 +204,7 @@
     </div>
 
     <div class="card mt-4 shadow-sm rounded-4">
-        <div class="card-header bg-info text-white">
+        <div class="card-header bg-primary text-white">
             Missing Percentage
         </div>
         <div class="card-body p-4">
@@ -221,7 +221,9 @@
             <hr class="my-4">
 
             <h5 class="mt-3">Dataset Quality Score</h5>
-            <p> {{ report.quality_score }}%</p>
+            <h2 class="display-6 text-primary">
+                {{ report.quality_score }}%
+            </h2>
             <hr class="my-4">
             
             <h5 class="mt-3">Missing Value Status</h5>
@@ -258,45 +260,37 @@
             {% endif %}  
         </div>
     </div>
-    
-
-    <form action="/download_report" method="get">
-        <button type="submit" class="btn btn-dark me-2 mb-2">
-            Download Analysis Report
-        </button>
-    </form>
-
 
     <div class="card mt-4 shadow-sm rounded-4">
         <div class="card-header bg-dark text-white">
             Data Cleaning
         </div>
         <div class="card-body p-4">
-            <form action="/remove_duplicates" method="post">
+            <form action="/remove_duplicates" method="post" class="mb-3">
                 <button type="submit" class="btn btn-danger me-2 mb-2">
                     Remove Duplicate Rows
                 </button>
             </form>
-            <hr class="my-4">
-            <form action="/remove_missing_rows" method="post">
+            
+            <form action="/remove_missing_rows" method="post" class="mb-3">
                 <button type="submit" class="btn btn-warning me-2 mb-2">
                     Remove Missing Rows
                 </button>
             </form>
-            <hr class="my-4">
-            <form action="/fill_mean" method="post">
+            
+            <form action="/fill_mean" method="post" class="mb-3">
                 <button type="submit" class="btn btn-success me-2 mb-2">
                     Fill Missing Values with Mean
                 </button>
             </form>
-            <hr class="my-4">
-            <form action="/fill_median" method="post">
+            
+            <form action="/fill_median" method="post" class="mb-3">
                 <button type="submit" class="btn btn-success me-2 mb-2">
                     Fill Missing Values with Median
                 </button>
             </form>
-            <hr class="my-4">
-            <form action="/fill_mode" method="post">
+            
+            <form action="/fill_mode" method="post" class="mb-3">
                 <button type="submit" class="btn btn-success me-2 mb-2">
                     Fill Missing Values with Mode
                 </button>
@@ -341,7 +335,7 @@
     </div>
     
     <div class="card mt-4 shadow-sm rounded-4">
-        <div class="card-header bg-info text-white">
+        <div class="card-header bg-primary text-white">
             Downloads
         </div>
         <div class="card-body p-4">
@@ -350,12 +344,17 @@
                     Download Cleaned CSV
                 </button>
             </form>
+            <form action="/download_report" method="get">
+                <button type="submit" class="btn btn-primary me-2 mb-2">
+                    Download Analysis Report
+                </button>
+            </form>
         </div>
     </div>
     <br>
 
     <div class="card mt-4 shadow-sm rounded-4">
-        <div class="card-header bg-info text-white">
+        <div class="card-header bg-primary text-white">
             Data Visualization
         </div>
         <div class="card-body p-4">
@@ -368,7 +367,7 @@
                         </option>
                     {% endfor %} 
                 </select>
-                <button type="submit" class="btn btn-info me-2 mb-2">Show Histogram</button>
+                <button type="submit" class="btn btn-primary mt-3 me-2 mb-2">Show Histogram</button>
             </form>
             {% if histogram_image %}
                 <h3>Histogram</h3>
@@ -385,7 +384,7 @@
                         </option>
                     {% endfor %}
                 </select>
-                <button type="submit" class="btn btn-info me-2 mb-2">Show Box Plot</button>
+                <button type="submit" class="btn btn-primary mt-3 me-2 mb-2">Show Box Plot</button>
             </form>
             {% if boxplot_image %}
                 <h3>Box Plot</h3>
@@ -416,7 +415,7 @@
                     {% endfor %}
                 </select>
 
-                <button type="submit" class="btn btn-info me-2 mb-2">Show Scatter Plot</button>
+                <button type="submit" class="btn btn-primary mt-3 me-2 mb-2">Show Scatter Plot</button>
             </form>
 
             {% if scatter_image %}
@@ -426,7 +425,7 @@
 
             <hr class="my-4">
             <form action="/show_heatmap" method="post">
-                <button type="submit" class="btn btn-info me-2 mb-2">Show Heatmap</button>
+                <button type="submit" class="btn btn-primary mt-3 me-2 mb-2">Show Heatmap</button>
             </form>
 
             {% if heatmap_image %}
@@ -445,7 +444,7 @@
                     </option>
                     {% endfor %}
                 </select>
-                <button type="submit" class="btn btn-info me-2 mb-2">Show Bar Chart</button>
+                <button type="submit" class="btn btn-primary mt-3 me-2 mb-2">Show Bar Chart</button>
             </form>
 
             {% if barchart_image %}
@@ -476,7 +475,7 @@
                     {% endfor %}
                 </select>
 
-                <button type="submit" class="btn btn-info me-2 mb-2">Show Line Chart</button>
+                <button type="submit" class="btn btn-primary mt-3 me-2 mb-2">Show Line Chart</button>
             </form>
             {% if linechart_image %}
                 <h3>Line Chart</h3>
@@ -497,7 +496,7 @@
                     </option>
                     {% endfor %}
                 </select>
-                <button type="submit" class="btn btn-info me-2 mb-2">Show Pie Chart</button>
+                <button type="submit" class="btn btn-primary mt-3 me-2 mb-2">Show Pie Chart</button>
             </form>
 
             {% if piechart_image %}
@@ -508,10 +507,6 @@
             {% endif %}
         </div>
     </div>
-   
-    <p class="text-center text-muted mt-4 fst-italic">
-        🚧 Project Under Development
-    </p>
 
     <footer class="bg-dark text-white text-center p-3 mt-5">
         <h5>DataSense AI</h5>
