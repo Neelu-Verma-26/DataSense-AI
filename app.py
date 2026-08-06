@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, send_file
+from flask import Flask, render_template, request, session, send_file, url_for, redirect
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -227,7 +227,7 @@ def generate_dataset_report(df):
 
 @app.route("/")
 def welcome():
-    return "THIS IS DATASENSE AI"
+    return redirect(url_for("upload"))
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
