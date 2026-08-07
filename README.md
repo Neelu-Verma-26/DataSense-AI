@@ -157,25 +157,3 @@ Future versions of DataSense AI will include:
 B.Tech CSE (AI & ML)
 
 GitHub: https://github.com/Neelu-Verma-26
-
-## 📸 Screenshots
-
-### Home Page
-
-> *(Add screenshot here after deployment)*
-
-### Dataset Analysis Dashboard
-
-> *(Add screenshot here after deployment)*
-
-### Data Cleaning
-
-> *(Add screenshot here after deployment)*
-
-### Data Visualization
-
-> *(Add screenshot here after deployment)*
-
-### Analysis Report
-
-> *(Add screenshot here after deployment)*
