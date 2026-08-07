@@ -26,23 +26,35 @@
             Upload Dataset
         </div>
         <div class="card-body p-4">
-            <form action="/upload" method="post" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label for="file" class="form-label">
-                        Choose CSV File
-                    </label>
-                    <input
-                        type="file"
-                        class="form-control"
-                        id="file"
-                        name="file">
-                </div>
-                <button
-                    type="submit"
-                    class="btn btn-primary">
-                    Upload Dataset
-                </button>
-            </form>
+        {% if not filename %}
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="file" class="form-label">
+                    Choose CSV File
+                </label>
+                <input
+                    type="file"
+                    class="form-control"
+                    id="file"
+                    name="file"
+                    required>
+            </div>
+            <button
+                type="submit"
+                class="btn btn-primary">
+                Upload Dataset
+            </button>
+
+        </form>
+        {% else %}
+        <div class="alert alert-success">
+            <h5>✅ Dataset Loaded Successfully</h5>
+            <strong>📁 {{ filename }}</strong>
+        </div>
+        <a href="/upload" class="btn btn-secondary">
+            Upload Another Dataset
+        </a>
+        {% endif %}
         </div>
     </div>
 

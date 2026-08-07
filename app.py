@@ -1,3 +1,5 @@
+from fileinput import filename
+
 from flask import Flask, render_template, request, session, send_file, url_for, redirect
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -17,9 +19,13 @@ def generate_dataset_report(df):
     if missing_values.empty:
             missing_values_html = "<p>No Missing Values found</p>"
     else:
-            missing_values_html = (missing_values.to_frame(name="Missing Values").to_html(
-    classes="table table-striped table-hover table-bordered",
-    index=False))
+            missing_values_html = (missing_values.rename_axis("Column")
+                                   .reset_index(name="Missing Values")
+                                   .to_html(
+                                       classes="table table-striped table-hover table-bordered",
+                                       index=False
+                                       )
+                                       )
 
     duplicate_rows = df.duplicated().sum()
     if duplicate_rows == 0:
@@ -49,23 +55,35 @@ def generate_dataset_report(df):
     categorical_columns = categorical_df.shape[1]
 
     column_types = df.dtypes
-    column_types_html = column_types.to_frame(name="Data Type").to_html(
-    classes="table table-striped table-hover table-bordered",
-    index=False
-)
+    column_types_html = (
+        column_types.rename_axis("Column")
+        .reset_index(name="Data Type")
+        .to_html(
+            classes="table table-striped table-hover table-bordered",
+            index=False
+        )
+    )
 
     unique_values = df.nunique()
-    unique_values_html = unique_values.to_frame(name="Unique Values").to_html(
-    classes="table table-striped table-hover table-bordered",
-    index=False
-)
+    unique_values_html = (
+        unique_values.rename_axis("Column")
+        .reset_index(name="Unique Values")
+        .to_html(
+            classes="table table-striped table-hover table-bordered",
+            index=False
+        )
+    )
     constant_columns = unique_values[unique_values == 1].index.tolist()
 
     missing_percentage = (missing_values / rows) * 100
-    missing_percentage_html = missing_percentage.to_frame(name="Missing Percentage (%)").to_html(
-    classes="table table-striped table-hover table-bordered",
-    index=False
-)
+    missing_percentage_html = (
+        missing_percentage.rename_axis("Column")
+            .reset_index(name="Missing Percentage (%)")
+            .to_html(
+                classes="table table-striped table-hover table-bordered",
+                index=False
+            )
+        )
 
     total_missing = missing_values.sum()
     overall_missing_percentage = (total_missing / (rows * columns)) * 100
@@ -231,27 +249,36 @@ def welcome():
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
+    report = None
+    filename = None
     if request.method == "POST":
-        uploaded_file = request.files["file"]
-        file_path = "uploads/" + uploaded_file.filename
+        uploaded_file = request.files.get("file")
 
-        session["file_path"] = file_path
+        if uploaded_file is None or uploaded_file.filename == "":
+            return "No file selected"
+
+        print("Filename:", uploaded_file.filename)
+
+        print(uploaded_file.filename)
+        print(request.files)
 
         UPLOAD_FOLDER = "uploads"
-
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
+ 
+        filename = uploaded_file.filename
         file_path = os.path.join(UPLOAD_FOLDER, uploaded_file.filename)
+       
+        session["file_path"] = file_path
 
         uploaded_file.save(file_path)
         df = pd.read_csv(file_path)
 
         report = generate_dataset_report(df)
 
-        return render_template("index.html",
-                                report=report)
+    return render_template("index.html",
+                            report=report,
+                            filename=filename)
     
-    return render_template("index.html", report=None)
 
 @app.route("/remove_duplicates", methods = ["POST"])
 def remove_duplicates():
@@ -373,7 +400,7 @@ def show_statistics():
 
     return render_template("index.html",
                             report=report,
-                            
+                            filename=filename,
                             mean_html=mean_html,
                             median_html=median_html,
                             mode_html=mode_html,
@@ -405,6 +432,7 @@ def show_histogram():
     report = generate_dataset_report(df)
 
     return render_template("index.html",
+                            filename=filename,
                             report=report,
                             histogram_image="histogram.png")
 
@@ -429,6 +457,7 @@ def show_boxplot():
     report = generate_dataset_report(df)
 
     return render_template("index.html",
+                            filename=filename,
                             report=report,
                             boxplot_image="boxplot.png")
 
@@ -447,6 +476,7 @@ def show_scatter():
     if not pd.api.types.is_numeric_dtype(df[x_column]) or not pd.api.types.is_numeric_dtype(df[y_column]):
         return render_template(
             "index.html",
+            filename=filename,
             report = report,
             histogram_image=None,
             boxplot_image=None,
@@ -466,6 +496,7 @@ def show_scatter():
     plt.close()
 
     return render_template("index.html",
+                           filename=filename,
                            report = report,
                            scatter_image= "scatter.png",
                            histogram_image=None,
@@ -500,6 +531,7 @@ def show_heatmap():
     plt.close()
 
     return render_template("index.html",
+                            filename=filename,
                             report=report,
                             histogram_image=None,
                             boxplot_image=None,
@@ -529,6 +561,7 @@ def show_barchart():
     plt.close()
 
     return render_template("index.html",
+                            filename=filename,
                             report=report,
                             histogram_image=None,
                             boxplot_image=None,
@@ -574,6 +607,7 @@ def show_linechart():
     plt.close()
 
     return render_template("index.html",
+                           filename=filename,
                            report=report,
                            histogram_image=None,
                            boxplot_image=None,
@@ -619,6 +653,7 @@ def show_piechart():
     plt.close()
 
     return render_template("index.html",
+                            filename=filename,
                             report=report,
                             histogram_image=None,
                             boxplot_image=None,
