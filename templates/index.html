@@ -310,12 +310,29 @@
         </div>
     </div>
 
+    <div class="card mt-4 shadow-sm rounded-4">
+        <div class="card-header bg-dark text-white">
+            Statistics
+        </div>
+
+        <div class="card-body p-4">
+            <form action="/show_statistics" method="post">
+                <button type="submit" class="btn btn-primary">
+                    Generate Statistics
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% if mean_html %}
 
     <div class="card mt-4 shadow-sm rounded-4">
         <div class="card-header bg-dark text-white">
             Statistics
         </div>
+
         <div class="card-body p-4">
+
             <h5 class="mt-3">Mean</h5>
             {{ mean_html|safe }}
             <hr class="my-4">
@@ -342,10 +359,12 @@
 
             <h5 class="mt-3">Variance</h5>
             {{ variance_html|safe }}
-            <hr class="my-4">
+
         </div>
     </div>
-    
+
+    {% endif %}
+
     <div class="card mt-4 shadow-sm rounded-4">
         <div class="card-header bg-primary text-white">
             Downloads

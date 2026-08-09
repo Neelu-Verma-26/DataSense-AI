@@ -374,12 +374,14 @@ def fill_mode():
 @app.route("/show_statistics", methods=["POST"])
 def show_statistics():
     file_path = session.get("file_path")
+
     if file_path is None:
-          return "Please upload a file first"
-     
+        return "Please upload a file first"
+
     df = pd.read_csv(file_path)
 
     numeric_df = df.select_dtypes(include="number")
+
     mean_values = numeric_df.mean()
     median_values = numeric_df.median()
     mode_values = numeric_df.mode()
@@ -388,26 +390,51 @@ def show_statistics():
     std_values = numeric_df.std()
     variance_values = numeric_df.var()
 
-    mean_html = mean_values.to_frame(name="Mean").to_html(classes="table table-bordered")
-    median_html = median_values.to_frame(name="Median").to_html(classes="table table-bordered")
-    mode_html = mode_values.to_html(classes="table table-bordered")
-    min_html = min_values.to_frame(name="Min").to_html(classes="table table-bordered")
-    max_html = max_values.to_frame(name="Max").to_html(classes="table table-bordered")
-    std_html = std_values.to_frame(name="Standard Deviation").to_html(classes="table table-bordered")
-    variance_html = variance_values.to_frame(name="Variance").to_html(classes="table table-bordered")
+    mean_html = mean_values.to_frame(name="Mean").to_html(
+        classes="table table-striped table-hover table-bordered"
+    )
+
+    median_html = median_values.to_frame(name="Median").to_html(
+        classes="table table-striped table-hover table-bordered"
+    )
+
+    mode_html = mode_values.to_html(
+        classes="table table-striped table-hover table-bordered",
+        index=False
+    )
+
+    min_html = min_values.to_frame(name="Minimum").to_html(
+        classes="table table-striped table-hover table-bordered"
+    )
+
+    max_html = max_values.to_frame(name="Maximum").to_html(
+        classes="table table-striped table-hover table-bordered"
+    )
+
+    std_html = std_values.to_frame(name="Standard Deviation").to_html(
+        classes="table table-striped table-hover table-bordered"
+    )
+
+    variance_html = variance_values.to_frame(name="Variance").to_html(
+        classes="table table-striped table-hover table-bordered"
+    )
 
     report = generate_dataset_report(df)
 
-    return render_template("index.html",
-                            report=report,
-                            filename=filename,
-                            mean_html=mean_html,
-                            median_html=median_html,
-                            mode_html=mode_html,
-                            min_html=min_html,
-                            max_html=max_html,
-                            std_html=std_html,
-                            variance_html=variance_html)
+    filename = os.path.basename(file_path)
+
+    return render_template(
+        "index.html",
+        report=report,
+        filename=filename,
+        mean_html=mean_html,
+        median_html=median_html,
+        mode_html=mode_html,
+        min_html=min_html,
+        max_html=max_html,
+        std_html=std_html,
+        variance_html=variance_html
+    )
 
 @app.route("/show_histogram", methods=["POST"])
 def show_histogram():
