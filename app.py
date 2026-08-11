@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+from sklearn.model_selection import train_test_split
 
 app = Flask(__name__)
 app.secret_key =  "datasense_ai_secret_key"
@@ -769,6 +770,26 @@ def download_report():
         report_path,
         as_attachment=True,
         download_name="DataSense_AI_Report.txt"
+    )
+
+@app.route("/prepare_ml", methods=["POST"])
+def prepare_ml():
+    file_path = session.get("file_path")
+    df = pd.read_csv(file_path)
+    X = df.drop(columns=["Sales"])
+    y = df["Sales"]    
+
+    X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42)
+    print("Training rows:", len(X_train))
+    print("Testing rows:", len(X_test))
+
+    return render_template(
+        "index.html",
+        ml_ready=True,
+        train_rows=len(X_train),
+        test_rows=len(X_test),
+        feature_count=X.shape[1],
+        target_column="Sales"
     )
 
 if __name__ == "__main__":

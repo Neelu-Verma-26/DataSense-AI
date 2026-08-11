@@ -363,7 +363,7 @@
         </div>
     </div>
 
-    {% endif %}
+    {% endif %}  
 
     <div class="card mt-4 shadow-sm rounded-4">
         <div class="card-header bg-primary text-white">
@@ -383,6 +383,34 @@
         </div>
     </div>
     <br>
+
+    <div class="card mt-4 shadow-sm">
+        <div class="card-header bg-dark text-white">
+            Machine Learning
+        </div>
+
+        <div class="card-body">
+            <form action="/prepare_ml" method="post">
+                <button type="submit" class="btn btn-primary">
+                    Prepare Dataset for ML
+                </button>
+            </form>
+            {% if ml_ready %}
+            <hr>
+
+            <h5>Dataset Prepared for Machine Learning</h5>
+
+            <p><strong>Total Features:</strong> {{ feature_count }}</p>
+            <p><strong>Target Column:</strong> {{ target_column }}</p>
+            <p><strong>Training Rows:</strong> {{ train_rows }}</p>
+            <p><strong>Testing Rows:</strong> {{ test_rows }}</p>
+
+            <div class="alert alert-success">
+                Dataset successfully split into training and testing data.
+            </div>
+            {% endif %}
+        </div>
+    </div>
 
     <div class="card mt-4 shadow-sm rounded-4">
         <div class="card-header bg-primary text-white">
