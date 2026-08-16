@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 
 app = Flask(__name__)
 app.secret_key =  "datasense_ai_secret_key"
@@ -776,15 +777,31 @@ def download_report():
 def prepare_ml():
     file_path = session.get("file_path")
     df = pd.read_csv(file_path)
-    X = df.drop(columns=["Sales"])
+
+    filename = os.path.basename(file_path)
+    report = generate_dataset_report(df)
+
+    df = df.dropna(subset=["Sales"])
+    X = df.drop(columns=["Sales", "Date"])
     y = df["Sales"]    
+    X = pd.get_dummies(X)
+
+    X = X.fillna(X.mean(numeric_only=True))
 
     X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42)
+    model = LinearRegression()
+    print(X_train.dtypes)
+
+    model.fit(X_train, y_train)
+    predictions = model.predict(X_test)
+
     print("Training rows:", len(X_train))
     print("Testing rows:", len(X_test))
 
     return render_template(
         "index.html",
+        report=report,
+        filename=filename,
         ml_ready=True,
         train_rows=len(X_train),
         test_rows=len(X_test),
