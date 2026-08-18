@@ -394,7 +394,15 @@
                 <button type="submit" class="btn btn-primary">
                     Prepare Dataset for ML
                 </button>
+
+                <label for="column" class="form-label">Select Target Column:</label>
+                <select class="form-select" name="target_column" id="column">
+                    {% for column in report.column_names %}
+                        <option value="{{ column }}">{{ column }}</option>
+                    {% endfor %} 
+                </select>
             </form>
+
             {% if ml_ready %}
             <hr>
 
@@ -408,6 +416,13 @@
             <div class="alert alert-success">
                 Dataset successfully split into training and testing data.
             </div>
+            {% endif %}
+
+            <hr class="my-4">
+            {% if error %}
+                <div class="alert alert-danger">
+                    {{ error }}
+                </div>
             {% endif %}
         </div>
     </div>

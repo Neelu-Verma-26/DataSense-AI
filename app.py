@@ -777,13 +777,23 @@ def download_report():
 def prepare_ml():
     file_path = session.get("file_path")
     df = pd.read_csv(file_path)
+    target_column = request.form["target_column"]
 
     filename = os.path.basename(file_path)
     report = generate_dataset_report(df)
 
-    df = df.dropna(subset=["Sales"])
-    X = df.drop(columns=["Sales", "Date"])
-    y = df["Sales"]    
+    if not pd.api.types.is_numeric_dtype(df[target_column]):
+        return render_template(
+            "index.html",
+            report=report,
+            filename=filename,
+            error=f"'{target_column}' must be a numeric column for Linear Regression."
+        )
+    
+    df = df.dropna(subset=[target_column])
+    
+    X = df.drop(columns=[target_column])
+    y = df[target_column]
     X = pd.get_dummies(X)
 
     X = X.fillna(X.mean(numeric_only=True))
@@ -806,7 +816,7 @@ def prepare_ml():
         train_rows=len(X_train),
         test_rows=len(X_test),
         feature_count=X.shape[1],
-        target_column="Sales"
+        target_column=target_column
     )
 
 if __name__ == "__main__":
