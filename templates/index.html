@@ -398,16 +398,16 @@
                 <label for="column" class="form-label">Select Target Column:</label>
                 <select class="form-select" name="target_column" id="column">
                     {% for column in report.column_names %}
-                        <option value="{{ column }}">{{ column }}</option>
-                    {% endfor %} 
+                        <option value="{{ column }}" {% if column == target_column %}selected{% endif %}>
+                            {{ column }}
+                        </option>
+                    {% endfor %}
                 </select>
             </form>
 
             {% if ml_ready %}
             <hr>
-
             <h5>Dataset Prepared for Machine Learning</h5>
-
             <p><strong>Total Features:</strong> {{ feature_count }}</p>
             <p><strong>Target Column:</strong> {{ target_column }}</p>
             <p><strong>Training Rows:</strong> {{ train_rows }}</p>
@@ -416,6 +416,48 @@
             <div class="alert alert-success">
                 Dataset successfully split into training and testing data.
             </div>
+
+            <hr>
+            <div class="row">
+
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        Linear Regression
+                    </div>
+                    <div class="card-body">
+                        <p><strong>MAE:</strong> {{ mae | round(2) }}</p>
+                        <p><strong>MSE:</strong> {{ mse | round(2) }}</p>
+                        <p><strong>RMSE:</strong> {{ rmse | round(2) }}</p>
+                        <p><strong>R² Score:</strong> {{ r2 | round(2) }}</p>
+                        <p>
+                            <strong>Performance:</strong> {{ model_message }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        Random Forest
+                    </div>
+
+                    <div class="card-body">
+                        <p><strong>MAE:</strong> {{ rf_mae | round(2) }}</p>
+                        <p><strong>MSE:</strong> {{ rf_mse | round(2) }}</p>
+                        <p><strong>RMSE:</strong> {{ rf_rmse | round(2) }}</p>
+                        <p><strong>R² Score:</strong> {{ rf_r2 | round(2) }}</p>
+                        <p><strong>Performance:</strong> {{ rf_model_message }}</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+            <hr class="my-4">
+            <h5>Model Comparison</h5>
+            <p><strong>Best Model:</strong> {{ best_model }}</p>
             {% endif %}
 
             <hr class="my-4">

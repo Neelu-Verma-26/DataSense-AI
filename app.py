@@ -7,6 +7,9 @@ import seaborn as sns
 import os
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+import math
+from sklearn.ensemble import RandomForestRegressor 
 
 app = Flask(__name__)
 app.secret_key =  "datasense_ai_secret_key"
@@ -800,13 +803,38 @@ def prepare_ml():
 
     X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42)
     model = LinearRegression()
-    print(X_train.dtypes)
-
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
 
-    print("Training rows:", len(X_train))
-    print("Testing rows:", len(X_test))
+    mae= mean_absolute_error(y_test, predictions)
+    mse = mean_squared_error(y_test, predictions)
+    rmse = math.sqrt(mse)
+    r2 = r2_score(y_test, predictions)
+    if r2 >= 0.7:
+        model_message = "Good"
+    elif 0.3 <= r2 < 0.7:
+        model_message = "Moderate"
+    else:
+        model_message = "Poor"
+
+    rf_model = RandomForestRegressor()
+    rf_model.fit(X_train, y_train)
+    rf_predictions = rf_model.predict(X_test)
+    rf_mae= mean_absolute_error(y_test, rf_predictions)
+    rf_mse = mean_squared_error(y_test, rf_predictions)
+    rf_rmse = math.sqrt(rf_mse)
+    rf_r2 = r2_score(y_test, rf_predictions)
+    if rf_r2 >= 0.7:
+        rf_model_message = "Good"
+    elif 0.3 <= rf_r2 < 0.7:
+        rf_model_message = "Moderate"
+    else:
+        rf_model_message = "Poor"
+
+    if rf_r2 > r2:
+        best_model = "Random Forest"
+    else:
+        best_model = "Linear Regression"
 
     return render_template(
         "index.html",
@@ -816,7 +844,18 @@ def prepare_ml():
         train_rows=len(X_train),
         test_rows=len(X_test),
         feature_count=X.shape[1],
-        target_column=target_column
+        target_column=target_column,
+        mae=mae,
+        mse=mse,
+        rmse=rmse,
+        r2=r2,
+        model_message=model_message,
+        rf_mae=rf_mae,
+        rf_mse=rf_mse,
+        rf_rmse=rf_rmse,
+        rf_r2=rf_r2,
+        rf_model_message=rf_model_message,
+        best_model=best_model
     )
 
 if __name__ == "__main__":
