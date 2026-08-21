@@ -403,6 +403,15 @@
                         </option>
                     {% endfor %}
                 </select>
+
+                <label for="problem_type" class="form-label mt-3">
+                    Select Problem Type:
+                </label>
+
+                <select class="form-select" name="problem_type" id="problem_type">
+                    <option value="regression">Regression</option>
+                    <option value="classification">Classification</option>
+                </select>
             </form>
 
             {% if ml_ready %}

@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score,  accuracy_score, precision_score, recall_score, f1_score
 import math
-from sklearn.ensemble import RandomForestRegressor 
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 
 app = Flask(__name__)
 app.secret_key =  "datasense_ai_secret_key"
@@ -781,11 +781,12 @@ def prepare_ml():
     file_path = session.get("file_path")
     df = pd.read_csv(file_path)
     target_column = request.form["target_column"]
+    problem_type = request.form["problem_type"]
 
     filename = os.path.basename(file_path)
     report = generate_dataset_report(df)
 
-    if not pd.api.types.is_numeric_dtype(df[target_column]):
+    if problem_type == "regression" and not pd.api.types.is_numeric_dtype(df[target_column]):
         return render_template(
             "index.html",
             report=report,
@@ -802,39 +803,40 @@ def prepare_ml():
     X = X.fillna(X.mean(numeric_only=True))
 
     X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42)
-    model = LinearRegression()
-    model.fit(X_train, y_train)
-    predictions = model.predict(X_test)
+    if problem_type == "regression":
+        model = LinearRegression()
+        model.fit(X_train, y_train)
+        predictions = model.predict(X_test)
 
-    mae= mean_absolute_error(y_test, predictions)
-    mse = mean_squared_error(y_test, predictions)
-    rmse = math.sqrt(mse)
-    r2 = r2_score(y_test, predictions)
-    if r2 >= 0.7:
-        model_message = "Good"
-    elif 0.3 <= r2 < 0.7:
-        model_message = "Moderate"
-    else:
-        model_message = "Poor"
+        mae= mean_absolute_error(y_test, predictions)
+        mse = mean_squared_error(y_test, predictions)
+        rmse = math.sqrt(mse)
+        r2 = r2_score(y_test, predictions)
+        if r2 >= 0.7:
+            model_message = "Good"
+        elif 0.3 <= r2 < 0.7:
+            model_message = "Moderate"
+        else:
+            model_message = "Poor"
 
-    rf_model = RandomForestRegressor()
-    rf_model.fit(X_train, y_train)
-    rf_predictions = rf_model.predict(X_test)
-    rf_mae= mean_absolute_error(y_test, rf_predictions)
-    rf_mse = mean_squared_error(y_test, rf_predictions)
-    rf_rmse = math.sqrt(rf_mse)
-    rf_r2 = r2_score(y_test, rf_predictions)
-    if rf_r2 >= 0.7:
-        rf_model_message = "Good"
-    elif 0.3 <= rf_r2 < 0.7:
-        rf_model_message = "Moderate"
-    else:
-        rf_model_message = "Poor"
+        rf_model = RandomForestRegressor()
+        rf_model.fit(X_train, y_train)
+        rf_predictions = rf_model.predict(X_test)
+        rf_mae= mean_absolute_error(y_test, rf_predictions)
+        rf_mse = mean_squared_error(y_test, rf_predictions)
+        rf_rmse = math.sqrt(rf_mse)
+        rf_r2 = r2_score(y_test, rf_predictions)
+        if rf_r2 >= 0.7:
+            rf_model_message = "Good"
+        elif 0.3 <= rf_r2 < 0.7:
+            rf_model_message = "Moderate"
+        else:
+            rf_model_message = "Poor"
 
-    if rf_r2 > r2:
-        best_model = "Random Forest"
-    else:
-        best_model = "Linear Regression"
+        if rf_r2 > r2:
+            best_model = "Random Forest"
+        else:
+            best_model = "Linear Regression"
 
     return render_template(
         "index.html",
