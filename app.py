@@ -10,6 +10,7 @@ from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score,  accuracy_score, precision_score, recall_score, f1_score
 import math
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.preprocessing import LabelEncoder
 
 app = Flask(__name__)
 app.secret_key =  "datasense_ai_secret_key"
@@ -802,6 +803,10 @@ def prepare_ml():
 
     X = X.fillna(X.mean(numeric_only=True))
 
+    if problem_type == "classification":
+        label_encoder = LabelEncoder()
+        y = label_encoder.fit_transform(y)
+
     X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42)
     if problem_type == "regression":
         model = LinearRegression()
@@ -838,6 +843,30 @@ def prepare_ml():
         else:
             best_model = "Linear Regression"
 
+    elif problem_type == "classification":
+        model = LogisticRegression(max_iter=1000)
+        model.fit(X_train, y_train)
+        predictions = model.predict(X_test)
+
+        accuracy = accuracy_score(y_test, predictions)
+        precision = precision_score(y_test, predictions, average="weighted", zero_division=0)
+        recall = recall_score(y_test, predictions, average="weighted", zero_division=0)
+        f1 = f1_score(y_test, predictions, average="weighted", zero_division=0)
+
+        rf_model = RandomForestClassifier()
+        rf_model.fit(X_train, y_train)
+        rf_predictions = rf_model.predict(X_test)
+
+        rf_accuracy = accuracy_score(y_test, rf_predictions)
+        rf_precision = precision_score(y_test, rf_predictions, average="weighted", zero_division=0)
+        rf_recall = recall_score(y_test, rf_predictions, average="weighted", zero_division=0)
+        rf_f1 = f1_score(y_test, rf_predictions, average="weighted", zero_division=0)
+
+        if rf_f1> f1:
+            best_model = "Random Forest Classifier"
+        else:
+            best_model = "Logistic Regression"
+
     return render_template(
         "index.html",
         report=report,
@@ -847,16 +876,29 @@ def prepare_ml():
         test_rows=len(X_test),
         feature_count=X.shape[1],
         target_column=target_column,
-        mae=mae,
-        mse=mse,
-        rmse=rmse,
-        r2=r2,
-        model_message=model_message,
-        rf_mae=rf_mae,
-        rf_mse=rf_mse,
-        rf_rmse=rf_rmse,
-        rf_r2=rf_r2,
-        rf_model_message=rf_model_message,
+        problem_type=problem_type,
+
+        mae=mae if problem_type == "regression" else None,
+        mse=mse if problem_type == "regression" else None,
+        rmse=rmse if problem_type == "regression" else None,
+        r2=r2 if problem_type == "regression" else None,
+        model_message=model_message if problem_type == "regression" else None,
+        
+        rf_mae=rf_mae if problem_type == "regression" else None,
+        rf_mse=rf_mse if problem_type == "regression" else None,
+        rf_rmse=rf_rmse if problem_type == "regression" else None,
+        rf_r2=rf_r2 if problem_type == "regression" else None,
+        rf_model_message=rf_model_message if problem_type == "regression" else None,
+
+        accuracy=accuracy if problem_type == "classification" else None,
+        precision=precision if problem_type == "classification" else None,
+        recall=recall if problem_type == "classification" else None,
+        f1=f1 if problem_type == "classification" else None,
+
+        rf_accuracy=rf_accuracy if problem_type == "classification" else None,
+        rf_precision=rf_precision if problem_type == "classification" else None,
+        rf_recall=rf_recall if problem_type == "classification" else None,
+        rf_f1=rf_f1 if problem_type == "classification" else None,
         best_model=best_model
     )
 
