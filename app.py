@@ -11,6 +11,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score,  
 import math
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
+import joblib
 
 app = Flask(__name__)
 app.secret_key =  "datasense_ai_secret_key"
@@ -800,6 +801,7 @@ def prepare_ml():
     X = df.drop(columns=[target_column])
     y = df[target_column]
     X = pd.get_dummies(X)
+    feature_columns = X.columns.tolist()
 
     X = X.fillna(X.mean(numeric_only=True))
 
@@ -862,10 +864,19 @@ def prepare_ml():
         rf_recall = recall_score(y_test, rf_predictions, average="weighted", zero_division=0)
         rf_f1 = f1_score(y_test, rf_predictions, average="weighted", zero_division=0)
 
-        if rf_f1> f1:
-            best_model = "Random Forest Classifier"
+        if rf_f1 > f1:
+            best_model = rf_model
+            best_model_name = "Random Forest Classifier"
         else:
-            best_model = "Logistic Regression"
+            best_model = model
+            best_model_name = "Logistic Regression"
+
+        model_path = os.path.join("models", "best_model.pkl")
+        model_data = {
+            "model": best_model,
+            "feature_columns": feature_columns
+        }
+        joblib.dump(model_data, model_path)
 
     return render_template(
         "index.html",
