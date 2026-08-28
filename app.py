@@ -800,6 +800,7 @@ def prepare_ml():
     
     X = df.drop(columns=[target_column])
     y = df[target_column]
+    input_columns = X.columns.tolist()
     X = pd.get_dummies(X)
     feature_columns = X.columns.tolist()
 
@@ -841,9 +842,11 @@ def prepare_ml():
             rf_model_message = "Poor"
 
         if rf_r2 > r2:
-            best_model = "Random Forest"
+            best_model = rf_model
+            best_model_name = "Random Forest"
         else:
-            best_model = "Linear Regression"
+            best_model = model
+            best_model_name = "Linear Regression"
 
     elif problem_type == "classification":
         model = LogisticRegression(max_iter=1000)
@@ -871,12 +874,12 @@ def prepare_ml():
             best_model = model
             best_model_name = "Logistic Regression"
 
-        model_path = os.path.join("models", "best_model.pkl")
-        model_data = {
-            "model": best_model,
-            "feature_columns": feature_columns
-        }
-        joblib.dump(model_data, model_path)
+    model_path = os.path.join("models", "best_model.pkl")
+    model_data = {
+        "model": best_model,
+        "feature_columns": feature_columns
+    }
+    joblib.dump(model_data, model_path)
 
     return render_template(
         "index.html",
@@ -910,8 +913,27 @@ def prepare_ml():
         rf_precision=rf_precision if problem_type == "classification" else None,
         rf_recall=rf_recall if problem_type == "classification" else None,
         rf_f1=rf_f1 if problem_type == "classification" else None,
-        best_model=best_model
+        best_model=best_model_name,
+        feature_columns=feature_columns,
+        input_columns=input_columns
     )
+
+@app.route("/predict", methods=["POST"])
+def predict():
+    model_path = os.path.join("models", "best_model.pkl")
+    model_data = joblib.load(model_path)
+    model = model_data["model"]
+    feature_columns = model_data["feature_columns"]
+
+    data = request.form.to_dict()
+    input_df = pd.DataFrame([data])
+    input_df = input_df.reindex(columns=feature_columns, fill_value=0)
+    input_df = input_df.apply(pd.to_numeric, errors="coerce")
+
+    prediction = model.predict(input_df)
+    prediction = prediction[0]
+
+    return str(prediction)
 
 if __name__ == "__main__":
     app.run(
