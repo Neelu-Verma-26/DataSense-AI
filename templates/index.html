@@ -526,13 +526,18 @@
                 {% for feature in input_columns %}
                     <div class="mb-3">
                         <label class="form-label">{{ feature }}</label>
-                        <input type="text" name="{{ feature }}" class="form-control">
+                        <input type="text" name="{{ feature }}" value="{{ input_data.get(feature, '') if input_data else '' }}" class="form-control">
                     </div>
                 {% endfor %}
                 <button type="submit" class="btn btn-primary">
                     Predict
                 </button>
             </form>
+            {% if prediction is not none %}
+                <div class="alert alert-success mt-3">
+                    <strong>Prediction:</strong> {{ prediction }}
+                </div>
+            {% endif %}
         </div>
     </div>
 

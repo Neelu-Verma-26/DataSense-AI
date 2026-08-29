@@ -877,7 +877,8 @@ def prepare_ml():
     model_path = os.path.join("models", "best_model.pkl")
     model_data = {
         "model": best_model,
-        "feature_columns": feature_columns
+        "feature_columns": feature_columns,
+        "input_columns": input_columns
     }
     joblib.dump(model_data, model_path)
 
@@ -924,6 +925,7 @@ def predict():
     model_data = joblib.load(model_path)
     model = model_data["model"]
     feature_columns = model_data["feature_columns"]
+    input_columns = model_data["input_columns"]
 
     data = request.form.to_dict()
     input_df = pd.DataFrame([data])
@@ -933,7 +935,21 @@ def predict():
     prediction = model.predict(input_df)
     prediction = prediction[0]
 
-    return str(prediction)
+    file_path = session.get("file_path")
+    df = pd.read_csv(file_path)
+
+    report = generate_dataset_report(df)
+    filename = os.path.basename(file_path)
+
+    return render_template(
+        "index.html",
+        report=report,
+        filename=filename,
+        ml_ready=True,
+        input_columns=input_columns,
+        input_data=data,
+        prediction=prediction
+    )
 
 if __name__ == "__main__":
     app.run(
