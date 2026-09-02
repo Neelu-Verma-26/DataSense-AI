@@ -7,7 +7,7 @@ import seaborn as sns
 import os
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score,  accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score,  accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 import math
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
@@ -852,6 +852,7 @@ def prepare_ml():
         model = LogisticRegression(max_iter=1000)
         model.fit(X_train, y_train)
         predictions = model.predict(X_test)
+        cm = confusion_matrix(y_test, predictions)
 
         accuracy = accuracy_score(y_test, predictions)
         precision = precision_score(y_test, predictions, average="weighted", zero_division=0)
@@ -860,7 +861,22 @@ def prepare_ml():
 
         rf_model = RandomForestClassifier()
         rf_model.fit(X_train, y_train)
+        rf_feature_importance = rf_model.feature_importances_
+
+        rf_feature_importance = dict(
+            zip(feature_columns, rf_feature_importance)
+        )
+
+        rf_feature_importance = dict(
+            sorted(
+                rf_feature_importance.items(),
+                key=lambda item: item[1],
+                reverse=True
+            )
+        )
+
         rf_predictions = rf_model.predict(X_test)
+        rf_cm = confusion_matrix(y_test, rf_predictions)
 
         rf_accuracy = accuracy_score(y_test, rf_predictions)
         rf_precision = precision_score(y_test, rf_predictions, average="weighted", zero_division=0)
@@ -909,6 +925,9 @@ def prepare_ml():
         precision=precision if problem_type == "classification" else None,
         recall=recall if problem_type == "classification" else None,
         f1=f1 if problem_type == "classification" else None,
+        rf_feature_importance=rf_feature_importance,
+        cm=cm.tolist() if problem_type == "classification" else None,
+        rf_cm=rf_cm.tolist() if problem_type == "classification" else None,
 
         rf_accuracy=rf_accuracy if problem_type == "classification" else None,
         rf_precision=rf_precision if problem_type == "classification" else None,

@@ -408,9 +408,16 @@
                     Select Problem Type:
                 </label>
 
-                <select class="form-select" name="problem_type" id="problem_type">
-                    <option value="regression">Regression</option>
-                    <option value="classification">Classification</option>
+                <select name="problem_type" class="form-select">
+                    <option value="regression"
+                        {% if problem_type == "regression" %}selected{% endif %}>
+                        Regression
+                    </option>
+
+                    <option value="classification"
+                        {% if problem_type == "classification" %}selected{% endif %}>
+                        Classification
+                    </option>
                 </select>
             </form>
 
@@ -451,7 +458,20 @@
                             <p><strong>Precision:</strong> {{ precision | round(2) }}</p>
                             <p><strong>Recall:</strong> {{ recall | round(2) }}</p>
                             <p><strong>F1 Score:</strong> {{ f1 | round(2) }}</p>
+
+                            <h4>Confusion Matrix</h4>
+                            <table class="table table-bordered">
+                                {% for row in cm %}
+                                <tr>
+                                    {% for value in row %}
+                                    <td>{{ value }}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </table>
                         {% endif %}
+                        
+
                         {% if problem_type == "regression" %}
                             <p>
                                 <strong>Performance:</strong> {{ model_message }}
@@ -496,6 +516,38 @@
                             <p><strong>Random Forest Precision:</strong> {{ rf_precision | round(2) }}</p>
                             <p><strong>Random Forest Recall:</strong> {{ rf_recall | round(2) }}</p>
                             <p><strong>Random Forest F1:</strong> {{ rf_f1 | round(2) }}</p>
+
+                            {% if rf_cm %}
+                                <h4>Confusion Matrix</h4>
+
+                                <table class="table table-bordered">
+                                    {% for row in rf_cm %}
+                                    <tr>
+                                        {% for value in row %}
+                                        <td>{{ value }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                            {% endif %}
+
+                            {% if rf_feature_importance %}
+                                <h4>Feature Importance</h4>
+
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th>Feature</th>
+                                        <th>Importance</th>
+                                    </tr>
+
+                                    {% for feature, importance in rf_feature_importance.items() %}
+                                    <tr>
+                                        <td>{{ feature }}</td>
+                                        <td>{{ "%.3f"|format(importance) }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
