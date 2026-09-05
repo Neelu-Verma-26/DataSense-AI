@@ -81,6 +81,18 @@ def generate_dataset_report(df):
         )
     )
     constant_columns = unique_values[unique_values == 1].index.tolist()
+    target_candidates = []
+
+    for column in column_names:
+        unique_count = df[column].nunique()
+
+        if pd.api.types.is_numeric_dtype(df[column]):
+            if unique_count > 1:
+                target_candidates.append(column)
+
+        elif df[column].dtype == "object":
+            if 2 <= unique_count <= 10:
+                target_candidates.append(column)
 
     missing_percentage = (missing_values / rows) * 100
     missing_percentage_html = (
@@ -211,6 +223,21 @@ def generate_dataset_report(df):
             target_column = column
             break
 
+        if target_column is None:
+            candidate_target = None
+            for column in column_names:
+                if pd.api.types.is_datetime64_any_dtype(df[column]):
+                    continue
+                if pd.api.types.is_numeric_dtype(df[column]) and unique_values[column] > 1:
+                    candidate_target = column
+                    break
+                if not pd.api.types.is_numeric_dtype(df[column]) and df[column].nunique() <= 10:
+                    candidate_target = column
+                    break
+            if candidate_target is not None:
+                target_column = candidate_target
+
+
     ml_readiness_score = quality_score
     if ml_readiness_score >= 90:
         ml_readiness_message = "✅ Ready for Machine Learning."
@@ -248,7 +275,8 @@ def generate_dataset_report(df):
     "recommendations": recommendations,
     "target_column": target_column,
     "ml_readiness_score": ml_readiness_score,
-    "ml_readiness_message": ml_readiness_message}        
+    "ml_readiness_message": ml_readiness_message,
+    "target_candidates": target_candidates}        
 
 @app.route("/")
 def welcome():
@@ -787,6 +815,8 @@ def prepare_ml():
 
     filename = os.path.basename(file_path)
     report = generate_dataset_report(df)
+
+    rf_feature_importance = None
 
     if problem_type == "regression" and not pd.api.types.is_numeric_dtype(df[target_column]):
         return render_template(
