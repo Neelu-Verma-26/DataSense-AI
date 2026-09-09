@@ -225,15 +225,22 @@ def generate_dataset_report(df):
 
         if target_column is None:
             candidate_target = None
-            for column in column_names:
-                if pd.api.types.is_datetime64_any_dtype(df[column]):
-                    continue
-                if pd.api.types.is_numeric_dtype(df[column]) and unique_values[column] > 1:
-                    candidate_target = column
-                    break
-                if not pd.api.types.is_numeric_dtype(df[column]) and df[column].nunique() <= 10:
-                    candidate_target = column
-                    break
+            identifier_keywords = ["id", "identifier", "code"]
+
+        for column in column_names:
+            if pd.api.types.is_datetime64_any_dtype(df[column]):
+                continue
+
+            column_words = column.lower().replace("_", " ").split()
+            if any(keyword in column_words for keyword in identifier_keywords):
+                continue
+
+            if pd.api.types.is_numeric_dtype(df[column]) and unique_values[column] > 1:
+                candidate_target = column
+
+            if not pd.api.types.is_numeric_dtype(df[column]) and 2 <= df[column].nunique() <= 10:
+                candidate_target = column
+                break
             if candidate_target is not None:
                 target_column = candidate_target
 
@@ -823,6 +830,8 @@ def prepare_ml():
             "index.html",
             report=report,
             filename=filename,
+            target_column=target_column,
+            problem_type=problem_type,
             error=f"'{target_column}' must be a numeric column for Linear Regression."
         )
     

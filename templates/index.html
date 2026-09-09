@@ -398,7 +398,12 @@
                 <label for="column" class="form-label">Select Target Column:</label>
                 <select class="form-select" name="target_column" id="column">
                     {% for column in report.column_names %}
-                        <option value="{{ column }}" {% if column == target_column %}selected{% endif %}>
+                        <option value="{{ column }}" 
+                        {% if target_column is defined %}
+                            {% if column == target_column %}selected{% endif %}
+                        {% elif column == report.target_column %}
+                            selected
+                        {% endif %}>
                             {{ column }}
                         </option>
                     {% endfor %}
