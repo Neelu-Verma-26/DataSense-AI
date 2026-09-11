@@ -563,6 +563,30 @@
             <hr class="my-4">
             <h5>Model Comparison</h5>
             <p><strong>Best Model:</strong> {{ best_model }}</p>
+
+            <div class="card shadow-sm mt-4">
+                <div class="card-header">
+                    Make a Prediction
+                </div>
+                <div class="card-body">
+                    <form action="/predict" method="POST">
+                        {% for feature in input_columns %}
+                            <div class="mb-3">
+                                <label class="form-label">{{ feature }}</label>
+                                <input type="text" name="{{ feature }}" value="{{ input_data.get(feature, '') if input_data else '' }}" class="form-control">
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary">
+                            Predict
+                        </button>
+                    </form>
+                    {% if prediction is not none %}
+                        <div class="alert alert-success mt-3">
+                            <strong>Prediction:</strong> {{ prediction }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
             {% endif %}
 
             <hr class="my-4">
@@ -574,29 +598,6 @@
         </div>
     </div>
 
-    <div class="card shadow-sm mt-4">
-        <div class="card-header">
-            Make a Prediction
-        </div>
-        <div class="card-body">
-            <form action="/predict" method="POST">
-                {% for feature in input_columns %}
-                    <div class="mb-3">
-                        <label class="form-label">{{ feature }}</label>
-                        <input type="text" name="{{ feature }}" value="{{ input_data.get(feature, '') if input_data else '' }}" class="form-control">
-                    </div>
-                {% endfor %}
-                <button type="submit" class="btn btn-primary">
-                    Predict
-                </button>
-            </form>
-            {% if prediction is not none %}
-                <div class="alert alert-success mt-3">
-                    <strong>Prediction:</strong> {{ prediction }}
-                </div>
-            {% endif %}
-        </div>
-    </div>
 
     <div class="card mt-4 shadow-sm rounded-4">
         <div class="card-header bg-primary text-white">

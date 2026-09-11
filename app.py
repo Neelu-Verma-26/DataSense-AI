@@ -985,16 +985,35 @@ def predict():
     feature_columns = model_data["feature_columns"]
     input_columns = model_data["input_columns"]
 
+    file_path = session.get("file_path")
+    df = pd.read_csv(file_path)
+
     data = request.form.to_dict()
     input_df = pd.DataFrame([data])
+
+    # ADD UNKNOWN-CATEGORY CHECK HERE
+    for column in input_columns:
+        if df[column].dtype == "object":
+            if data[column] not in df[column].dropna().unique():
+                return render_template(
+                    "index.html",
+                    report=generate_dataset_report(df),
+                    filename=os.path.basename(file_path),
+                    ml_ready=False,
+                    input_columns=input_columns,
+                    input_data=data,
+                    prediction=None,
+                    error=f"Unknown category '{data[column]}' for column '{column}'."
+                )
+
+    input_df = pd.get_dummies(input_df)
+
     input_df = input_df.reindex(columns=feature_columns, fill_value=0)
     input_df = input_df.apply(pd.to_numeric, errors="coerce")
+    input_df = input_df.fillna(0)
 
     prediction = model.predict(input_df)
     prediction = prediction[0]
-
-    file_path = session.get("file_path")
-    df = pd.read_csv(file_path)
 
     report = generate_dataset_report(df)
     filename = os.path.basename(file_path)
