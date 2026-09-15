@@ -595,6 +595,12 @@
                     {{ error }}
                 </div>
             {% endif %}
+
+            {% if prediction_error %}
+                <div class="alert alert-danger">
+                    {{ prediction_error }}
+                </div>
+            {% endif %}
         </div>
     </div>
 

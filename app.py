@@ -1003,7 +1003,7 @@ def predict():
                     input_columns=input_columns,
                     input_data=data,
                     prediction=None,
-                    error=f"Unknown category '{data[column]}' for column '{column}'."
+                    prediction_error=f"Unknown category '{data[column]}' for column '{column}'."
                 )
 
     input_df = pd.get_dummies(input_df)
