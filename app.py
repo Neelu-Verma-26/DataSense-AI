@@ -1,16 +1,18 @@
 from fileinput import filename
-
 from flask import Flask, render_template, request, session, send_file, url_for, redirect
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+import math
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score,  accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
-import math
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
 import joblib
 
 app = Flask(__name__)
@@ -839,12 +841,26 @@ def prepare_ml():
     
     X = df.drop(columns=[target_column])
     y = df[target_column]
+
     input_columns = X.columns.tolist()
-    X = pd.get_dummies(X)
-    feature_columns = X.columns.tolist()
 
-    X = X.fillna(X.mean(numeric_only=True))
+    numeric_columns = X.select_dtypes(include=["number"]).columns.tolist()
+    categorical_columns = X.select_dtypes(include=["object"]).columns.tolist()
 
+    numeric_pipeline = Pipeline([
+        ("imputer", SimpleImputer(strategy="mean"))
+    ])
+
+    categorical_pipeline = Pipeline([
+        ("imputer", SimpleImputer(strategy="most_frequent")),
+        ("encoder", OneHotEncoder(handle_unknown="ignore"))
+    ])
+
+    preprocessor = ColumnTransformer([
+        ("num", numeric_pipeline, numeric_columns),
+        ("cat", categorical_pipeline, categorical_columns)
+    ])
+    
     if problem_type == "classification":
         label_encoder = LabelEncoder()
         y = label_encoder.fit_transform(y)
@@ -852,8 +868,12 @@ def prepare_ml():
     X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42)
     if problem_type == "regression":
         model = LinearRegression()
-        model.fit(X_train, y_train)
-        predictions = model.predict(X_test)
+        pipeline = Pipeline([
+            ("preprocessor", preprocessor),
+            ("model", model)
+        ])
+        pipeline.fit(X_train, y_train)
+        predictions = pipeline.predict(X_test)
 
         mae= mean_absolute_error(y_test, predictions)
         mse = mean_squared_error(y_test, predictions)
@@ -867,12 +887,18 @@ def prepare_ml():
             model_message = "Poor"
 
         rf_model = RandomForestRegressor()
-        rf_model.fit(X_train, y_train)
-        rf_predictions = rf_model.predict(X_test)
+        rf_pipeline = Pipeline([
+            ("preprocessor", preprocessor),
+            ("model", rf_model)
+        ])
+        rf_pipeline.fit(X_train, y_train)
+        rf_predictions = rf_pipeline.predict(X_test)
+
         rf_mae= mean_absolute_error(y_test, rf_predictions)
         rf_mse = mean_squared_error(y_test, rf_predictions)
         rf_rmse = math.sqrt(rf_mse)
         rf_r2 = r2_score(y_test, rf_predictions)
+
         if rf_r2 >= 0.7:
             rf_model_message = "Good"
         elif 0.3 <= rf_r2 < 0.7:
@@ -881,16 +907,21 @@ def prepare_ml():
             rf_model_message = "Poor"
 
         if rf_r2 > r2:
-            best_model = rf_model
+            best_pipeline = rf_pipeline
             best_model_name = "Random Forest"
         else:
-            best_model = model
+            best_pipeline = pipeline
             best_model_name = "Linear Regression"
 
     elif problem_type == "classification":
         model = LogisticRegression(max_iter=1000)
-        model.fit(X_train, y_train)
-        predictions = model.predict(X_test)
+        pipeline = Pipeline([
+            ("preprocessor", preprocessor),
+            ("model", model)
+        ])
+        pipeline.fit(X_train, y_train)
+        predictions = pipeline.predict(X_test)
+
         cm = confusion_matrix(y_test, predictions)
 
         accuracy = accuracy_score(y_test, predictions)
@@ -899,22 +930,28 @@ def prepare_ml():
         f1 = f1_score(y_test, predictions, average="weighted", zero_division=0)
 
         rf_model = RandomForestClassifier()
-        rf_model.fit(X_train, y_train)
-        rf_feature_importance = rf_model.feature_importances_
+        rf_pipeline = Pipeline([
+            ("preprocessor", preprocessor),
+            ("model", rf_model)
+        ])
+        rf_pipeline.fit(X_train, y_train) 
+        rf_feature_importance = rf_pipeline.named_steps["model"].feature_importances_
+
+        feature_names = rf_pipeline.named_steps["preprocessor"].get_feature_names_out()
 
         rf_feature_importance = dict(
-            zip(feature_columns, rf_feature_importance)
+            zip(feature_names, rf_feature_importance)
         )
 
         rf_feature_importance = dict(
             sorted(
                 rf_feature_importance.items(),
-                key=lambda item: item[1],
+                key=lambda x: x[1],
                 reverse=True
             )
         )
 
-        rf_predictions = rf_model.predict(X_test)
+        rf_predictions = rf_pipeline.predict(X_test)
         rf_cm = confusion_matrix(y_test, rf_predictions)
 
         rf_accuracy = accuracy_score(y_test, rf_predictions)
@@ -923,16 +960,15 @@ def prepare_ml():
         rf_f1 = f1_score(y_test, rf_predictions, average="weighted", zero_division=0)
 
         if rf_f1 > f1:
-            best_model = rf_model
+            best_pipeline = rf_pipeline
             best_model_name = "Random Forest Classifier"
         else:
-            best_model = model
+            best_pipeline = pipeline
             best_model_name = "Logistic Regression"
 
     model_path = os.path.join("models", "best_model.pkl")
     model_data = {
-        "model": best_model,
-        "feature_columns": feature_columns,
+        "pipeline": best_pipeline,
         "input_columns": input_columns
     }
     joblib.dump(model_data, model_path)
@@ -973,7 +1009,6 @@ def prepare_ml():
         rf_recall=rf_recall if problem_type == "classification" else None,
         rf_f1=rf_f1 if problem_type == "classification" else None,
         best_model=best_model_name,
-        feature_columns=feature_columns,
         input_columns=input_columns
     )
 
@@ -981,8 +1016,7 @@ def prepare_ml():
 def predict():
     model_path = os.path.join("models", "best_model.pkl")
     model_data = joblib.load(model_path)
-    model = model_data["model"]
-    feature_columns = model_data["feature_columns"]
+    pipeline = model_data["pipeline"]
     input_columns = model_data["input_columns"]
 
     file_path = session.get("file_path")
@@ -991,28 +1025,7 @@ def predict():
     data = request.form.to_dict()
     input_df = pd.DataFrame([data])
 
-    # ADD UNKNOWN-CATEGORY CHECK HERE
-    for column in input_columns:
-        if df[column].dtype == "object":
-            if data[column] not in df[column].dropna().unique():
-                return render_template(
-                    "index.html",
-                    report=generate_dataset_report(df),
-                    filename=os.path.basename(file_path),
-                    ml_ready=False,
-                    input_columns=input_columns,
-                    input_data=data,
-                    prediction=None,
-                    prediction_error=f"Unknown category '{data[column]}' for column '{column}'."
-                )
-
-    input_df = pd.get_dummies(input_df)
-
-    input_df = input_df.reindex(columns=feature_columns, fill_value=0)
-    input_df = input_df.apply(pd.to_numeric, errors="coerce")
-    input_df = input_df.fillna(0)
-
-    prediction = model.predict(input_df)
+    prediction = pipeline.predict(input_df)
     prediction = prediction[0]
 
     report = generate_dataset_report(df)
