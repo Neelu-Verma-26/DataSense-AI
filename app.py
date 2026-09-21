@@ -1024,6 +1024,12 @@ def predict():
 
     data = request.form.to_dict()
     input_df = pd.DataFrame([data])
+    for column in df.select_dtypes(include=["number"]).columns:
+        if column in input_df.columns:
+            input_df[column] = pd.to_numeric(
+                input_df[column],
+                errors="coerce"
+            )
 
     prediction = pipeline.predict(input_df)
     prediction = prediction[0]
