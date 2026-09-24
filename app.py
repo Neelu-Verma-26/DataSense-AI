@@ -935,17 +935,48 @@ def prepare_ml():
             ("model", rf_model)
         ])
         rf_pipeline.fit(X_train, y_train) 
-        rf_feature_importance = rf_pipeline.named_steps["model"].feature_importances_
+        preprocessor_fitted = rf_pipeline.named_steps["preprocessor"]
+        rf_model_fitted = rf_pipeline.named_steps["model"]
 
-        feature_names = rf_pipeline.named_steps["preprocessor"].get_feature_names_out()
+        importances = rf_model_fitted.feature_importances_
 
-        rf_feature_importance = dict(
-            zip(feature_names, rf_feature_importance)
+        feature_importance = {}
+
+        # Numeric features
+        num_indices = preprocessor_fitted.output_indices_["num"]
+
+        for column, importance in zip(
+            numeric_columns,
+            importances[num_indices]
+        ):
+            feature_importance[column] = float(importance)
+
+        # Categorical features
+        cat_indices = preprocessor_fitted.output_indices_["cat"]
+        cat_importances = importances[cat_indices]
+
+        encoder = (
+            preprocessor_fitted
+            .named_transformers_["cat"]
+            .named_steps["encoder"]
         )
+
+        start = 0
+
+        for column, categories in zip(
+            categorical_columns,
+            encoder.categories_
+        ):
+            count = len(categories)
+
+            feature_importance[column] = float(cat_importances[
+                start:start + count].sum())
+
+            start += count
 
         rf_feature_importance = dict(
             sorted(
-                rf_feature_importance.items(),
+                feature_importance.items(),
                 key=lambda x: x[1],
                 reverse=True
             )
