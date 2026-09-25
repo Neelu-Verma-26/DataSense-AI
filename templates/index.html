@@ -475,24 +475,6 @@
                                 {% endfor %}
                             </table>
                         {% endif %}
-                        
-
-                        {% if problem_type == "regression" %}
-                            <p>
-                                <strong>Performance:</strong> {{ model_message }}
-                            </p>
-                        {% elif problem_type == "classification" %}
-                            <p>
-                                <strong>Performance:</strong>
-                                {% if f1 >= 0.7 %}
-                                    Good
-                                {% elif f1 >= 0.3 %}
-                                    Moderate
-                                {% else %}
-                                    Poor
-                                {% endif %}
-                            </p>
-                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -513,7 +495,6 @@
                             <p><strong>MSE:</strong> {{ rf_mse | round(2) }}</p>
                             <p><strong>RMSE:</strong> {{ rf_rmse | round(2) }}</p>
                             <p><strong>R² Score:</strong> {{ rf_r2 | round(2) }}</p>
-                            <p><strong>Performance:</strong> {{ rf_model_message }}</p>
                         {% endif %}
 
                         {% if problem_type == "classification" %}

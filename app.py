@@ -879,12 +879,6 @@ def prepare_ml():
         mse = mean_squared_error(y_test, predictions)
         rmse = math.sqrt(mse)
         r2 = r2_score(y_test, predictions)
-        if r2 >= 0.7:
-            model_message = "Good"
-        elif 0.3 <= r2 < 0.7:
-            model_message = "Moderate"
-        else:
-            model_message = "Poor"
 
         rf_model = RandomForestRegressor()
         rf_pipeline = Pipeline([
@@ -898,13 +892,6 @@ def prepare_ml():
         rf_mse = mean_squared_error(y_test, rf_predictions)
         rf_rmse = math.sqrt(rf_mse)
         rf_r2 = r2_score(y_test, rf_predictions)
-
-        if rf_r2 >= 0.7:
-            rf_model_message = "Good"
-        elif 0.3 <= rf_r2 < 0.7:
-            rf_model_message = "Moderate"
-        else:
-            rf_model_message = "Poor"
 
         if rf_r2 > r2:
             best_pipeline = rf_pipeline
@@ -1019,14 +1006,12 @@ def prepare_ml():
         mse=mse if problem_type == "regression" else None,
         rmse=rmse if problem_type == "regression" else None,
         r2=r2 if problem_type == "regression" else None,
-        model_message=model_message if problem_type == "regression" else None,
         
         rf_mae=rf_mae if problem_type == "regression" else None,
         rf_mse=rf_mse if problem_type == "regression" else None,
         rf_rmse=rf_rmse if problem_type == "regression" else None,
         rf_r2=rf_r2 if problem_type == "regression" else None,
-        rf_model_message=rf_model_message if problem_type == "regression" else None,
-
+       
         accuracy=accuracy if problem_type == "classification" else None,
         precision=precision if problem_type == "classification" else None,
         recall=recall if problem_type == "classification" else None,
@@ -1062,11 +1047,23 @@ def predict():
                 errors="coerce"
             )
 
-    prediction = pipeline.predict(input_df)
-    prediction = prediction[0]
-
     report = generate_dataset_report(df)
     filename = os.path.basename(file_path)
+
+    try:
+        prediction = pipeline.predict(input_df)
+        prediction = prediction[0]
+    except Exception as e:
+        return render_template(
+            "index.html",
+            report=report,
+            filename=filename,
+            ml_ready=True,
+            input_columns=input_columns,
+            input_data=data,
+            prediction=None,
+            prediction_error=str(e)
+        )
 
     return render_template(
         "index.html",
