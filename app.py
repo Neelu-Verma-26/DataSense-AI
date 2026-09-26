@@ -1042,10 +1042,55 @@ def predict():
     input_df = pd.DataFrame([data])
     for column in df.select_dtypes(include=["number"]).columns:
         if column in input_df.columns:
+            value = input_df[column].iloc[0]
+
+            if value.strip() != "":
+                try:
+                    float(value)
+                except ValueError:
+                    return render_template(
+                        "index.html",
+                        report=generate_dataset_report(df),
+                        filename=os.path.basename(file_path),
+                        ml_ready=True,
+                        input_columns=input_columns,
+                        input_data=data,
+                        prediction=None,
+                        prediction_error=f"'{column}' must contain a numeric value."
+                    )
+
             input_df[column] = pd.to_numeric(
                 input_df[column],
                 errors="coerce"
             )
+
+    for column in df.select_dtypes(include=["object"]).columns:
+        if column in input_df.columns:
+            value = input_df[column].iloc[0]
+
+            if value.strip() != "":
+                training_values = df[column].dropna().astype(str).str.strip()
+
+                numeric_ratio = pd.to_numeric(
+                    training_values,
+                    errors="coerce"
+                ).notna().mean()
+
+                if numeric_ratio < 0.5:
+                    try:
+                        float(value)
+                        return render_template(
+                            "index.html",
+                            report=generate_dataset_report(df),
+                            filename=os.path.basename(file_path),
+                            ml_ready=True,
+                            input_columns=input_columns,
+                            input_data=data,
+                            prediction=None,
+                            prediction_error=f"'{column}' must contain a text value."
+                        )
+                    except ValueError:
+                        pass
 
     report = generate_dataset_report(df)
     filename = os.path.basename(file_path)
