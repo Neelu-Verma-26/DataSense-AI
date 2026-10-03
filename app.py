@@ -987,7 +987,39 @@ def prepare_ml():
     model_path = os.path.join("models", "best_model.pkl")
     model_data = {
         "pipeline": best_pipeline,
-        "input_columns": input_columns
+        "input_columns": input_columns,
+
+        "train_rows": len(X_train),
+        "test_rows": len(X_test),
+        "feature_count": X.shape[1],
+        "target_column": target_column,
+        "problem_type": problem_type,
+
+        "mae": mae if problem_type == "regression" else None,
+        "mse": mse if problem_type == "regression" else None,
+        "rmse": rmse if problem_type == "regression" else None,
+        "r2": r2 if problem_type == "regression" else None,
+
+        "rf_mae": rf_mae if problem_type == "regression" else None,
+        "rf_mse": rf_mse if problem_type == "regression" else None,
+        "rf_rmse": rf_rmse if problem_type == "regression" else None,
+        "rf_r2": rf_r2 if problem_type == "regression" else None,
+
+        "accuracy": accuracy if problem_type == "classification" else None,
+        "precision": precision if problem_type == "classification" else None,
+        "recall": recall if problem_type == "classification" else None,
+        "f1": f1 if problem_type == "classification" else None,
+
+        "rf_accuracy": rf_accuracy if problem_type == "classification" else None,
+        "rf_precision": rf_precision if problem_type == "classification" else None,
+        "rf_recall": rf_recall if problem_type == "classification" else None,
+        "rf_f1": rf_f1 if problem_type == "classification" else None,
+
+        "cm": cm.tolist() if problem_type == "classification" else None,
+        "rf_cm": rf_cm.tolist() if problem_type == "classification" else None,
+
+        "rf_feature_importance": rf_feature_importance,
+        "best_model": best_model_name
     }
     joblib.dump(model_data, model_path)
 
@@ -1034,6 +1066,40 @@ def predict():
     model_data = joblib.load(model_path)
     pipeline = model_data["pipeline"]
     input_columns = model_data["input_columns"]
+
+    ml_context = {
+        "ml_ready": True,
+        "train_rows": model_data.get("train_rows"),
+        "test_rows": model_data.get("test_rows"),
+        "feature_count": model_data.get("feature_count"),
+        "target_column": model_data.get("target_column"),
+        "problem_type": model_data.get("problem_type"),
+
+        "mae": model_data.get("mae"),
+        "mse": model_data.get("mse"),
+        "rmse": model_data.get("rmse"),
+        "r2": model_data.get("r2"),
+
+        "rf_mae": model_data.get("rf_mae"),
+        "rf_mse": model_data.get("rf_mse"),
+        "rf_rmse": model_data.get("rf_rmse"),
+        "rf_r2": model_data.get("rf_r2"),
+
+        "accuracy": model_data.get("accuracy"),
+        "precision": model_data.get("precision"),
+        "recall": model_data.get("recall"),
+        "f1": model_data.get("f1"),
+
+        "rf_accuracy": model_data.get("rf_accuracy"),
+        "rf_precision": model_data.get("rf_precision"),
+        "rf_recall": model_data.get("rf_recall"),
+        "rf_f1": model_data.get("rf_f1"),
+
+        "cm": model_data.get("cm"),
+        "rf_cm": model_data.get("rf_cm"),
+        "rf_feature_importance": model_data.get("rf_feature_importance"),
+        "best_model": model_data.get("best_model")
+    }
 
     file_path = session.get("file_path")
     df = pd.read_csv(file_path)
@@ -1114,10 +1180,10 @@ def predict():
         "index.html",
         report=report,
         filename=filename,
-        ml_ready=True,
         input_columns=input_columns,
         input_data=data,
-        prediction=prediction
+        prediction=prediction,
+        **ml_context
     )
 
 if __name__ == "__main__":

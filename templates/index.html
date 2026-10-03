@@ -391,11 +391,11 @@
 
         <div class="card-body">
             <form action="/prepare_ml" method="post">
-                <button type="submit" class="btn btn-primary">
-                    Prepare Dataset for ML
-                </button>
 
-                <label for="column" class="form-label">Select Target Column:</label>
+                <label for="column" class="form-label">
+                    Select Target Column:
+                </label>
+
                 <select class="form-select" name="target_column" id="column">
                     {% for column in report.column_names %}
                         <option value="{{ column }}" 
@@ -424,6 +424,11 @@
                         Classification
                     </option>
                 </select>
+
+                <button type="submit" class="btn btn-primary mt-3">
+                    Prepare Dataset for ML
+                </button>
+
             </form>
 
             {% if ml_ready %}
