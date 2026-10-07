@@ -834,7 +834,7 @@ def prepare_ml():
             filename=filename,
             target_column=target_column,
             problem_type=problem_type,
-            error=f"'{target_column}' must be a numeric column for Linear Regression."
+            ml_error=f"'{target_column}' must be a numeric column for Linear Regression."
         )
     
     df = df.dropna(subset=[target_column])
