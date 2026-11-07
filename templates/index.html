@@ -126,6 +126,95 @@
 
         {% if report %}
 
+        <!-- Dashboard Overview -->
+
+        <div class="mt-4 mb-4">
+
+            <h2 class="mb-2">Dashboard Overview</h2>
+
+            <p class="text-muted">
+                Get a quick overview of your uploaded dataset.
+            </p>
+
+            <div class="row g-3">
+
+                <!-- Total Rows -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-muted">Total Rows</h6>
+                            <h2 class="text-primary">
+                                {{ report.rows }}
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Columns -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-muted">Total Columns</h6>
+                            <h2 class="text-primary">
+                                {{ report.columns }}
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quality Score -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-muted">Dataset Quality</h6>
+                            <h2 class="text-success">
+                                {{ report.quality_score }}%
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ML Readiness -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-muted">ML Readiness</h6>
+                            <h2 class="text-info">
+                                {{ report.ml_readiness_score }}%
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Missing Values -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-muted">Missing Values</h6>
+                            <h2 class="text-warning">
+                                {{ report.total_missing_values }}
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Duplicate Rows -->
+                <div class="col-md-4 col-sm-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-muted">Duplicate Rows</h6>
+                            <h2 class="text-danger">
+                                {{ report.duplicate_rows }}
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <hr class="my-4">
+
         <hr class="my-4">
         <div class="card mt-4 shadow-sm">
             <div class="card-header bg-dark text-white">

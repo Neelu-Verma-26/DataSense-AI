@@ -263,6 +263,7 @@ def generate_dataset_report(df):
     "column_names": column_names,
     "missing_values_html": missing_values_html,
     "duplicate_rows": duplicate_rows,
+    "total_missing_values": int(total_missing),
     "table": table,
     "memory_usage": memory_size,
     "numeric_columns": numeric_columns, 
