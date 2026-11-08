@@ -47,6 +47,16 @@
             width: calc(100% - 250px);
             padding: 20px 0;
         }
+        /* Dashboard Card Hover Effect */
+        .dashboard-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-radius: 10px;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        }
     </style>
     <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
 </head>
@@ -140,9 +150,9 @@
 
                 <!-- Total Rows -->
                 <div class="col-md-4 col-sm-6">
-                    <div class="card shadow-sm h-100">
+                    <div class="card shadow-sm h-100 dashboard-card">
                         <div class="card-body">
-                            <h6 class="text-muted">Total Rows</h6>
+                            <h6 class="text-muted">📄 Total Rows</h6>
                             <h2 class="text-primary">
                                 {{ report.rows }}
                             </h2>
@@ -152,9 +162,9 @@
 
                 <!-- Total Columns -->
                 <div class="col-md-4 col-sm-6">
-                    <div class="card shadow-sm h-100">
+                    <div class="card shadow-sm h-100 dashboard-card">
                         <div class="card-body">
-                            <h6 class="text-muted">Total Columns</h6>
+                            <h6 class="text-muted">📊 Total Columns</h6>
                             <h2 class="text-primary">
                                 {{ report.columns }}
                             </h2>
@@ -164,9 +174,9 @@
 
                 <!-- Quality Score -->
                 <div class="col-md-4 col-sm-6">
-                    <div class="card shadow-sm h-100">
+                    <div class="card shadow-sm h-100 dashboard-card">
                         <div class="card-body">
-                            <h6 class="text-muted">Dataset Quality</h6>
+                            <h6 class="text-muted">✨ Dataset Quality</h6>
                             <h2 class="text-success">
                                 {{ report.quality_score }}%
                             </h2>
@@ -176,9 +186,9 @@
 
                 <!-- ML Readiness -->
                 <div class="col-md-4 col-sm-6">
-                    <div class="card shadow-sm h-100">
+                    <div class="card shadow-sm h-100 dashboard-card">
                         <div class="card-body">
-                            <h6 class="text-muted">ML Readiness</h6>
+                            <h6 class="text-muted">🤖 ML Readiness</h6>
                             <h2 class="text-info">
                                 {{ report.ml_readiness_score }}%
                             </h2>
@@ -188,9 +198,9 @@
 
                 <!-- Missing Values -->
                 <div class="col-md-4 col-sm-6">
-                    <div class="card shadow-sm h-100">
+                    <div class="card shadow-sm h-100 dashboard-card">
                         <div class="card-body">
-                            <h6 class="text-muted">Missing Values</h6>
+                            <h6 class="text-muted">⚠️ Missing Values</h6>
                             <h2 class="text-warning">
                                 {{ report.total_missing_values }}
                             </h2>
@@ -200,9 +210,9 @@
 
                 <!-- Duplicate Rows -->
                 <div class="col-md-4 col-sm-6">
-                    <div class="card shadow-sm h-100">
+                    <div class="card shadow-sm h-100 dashboard-card">
                         <div class="card-body">
-                            <h6 class="text-muted">Duplicate Rows</h6>
+                            <h6 class="text-muted">📑 Duplicate Rows</h6>
                             <h2 class="text-danger">
                                 {{ report.duplicate_rows }}
                             </h2>
@@ -214,12 +224,12 @@
         </div>
 
         <hr class="my-4">
-
-        <hr class="my-4">
-        <div class="card mt-4 shadow-sm">
-            <div class="card-header bg-dark text-white">
-                Dataset Preview
+        <div class="card mt-4 shadow-sm rounded-4 border-0">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h5 class="mb-0">📋 Dataset Preview</h5>
+                <small>Explore the first few rows of your uploaded dataset.</small>
             </div>
+
             <div class="card-body p-4">
                 <div class="table-responsive">
                     {{ report.table | safe }}
@@ -229,9 +239,9 @@
 
         <div class="row mt-4">
             <div class="col-md-6">
-                <div class="card h-100 shadow rounded-4">
-                    <div class="card-header bg-primary text-white">
-                        Dataset Summary
+                <div class="card h-100 shadow rounded-4 border-0">
+                    <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                        <h5 class="mb-0">📊 Dataset Summary</h5>
                     </div>
                     <div class="card-body p-4">
                         <p class="mb-2"><strong>Rows:</strong> {{ report.rows }}</p>
@@ -244,9 +254,9 @@
             </div>
 
             <div class="col-md-6">
-                <div class="card h-100 shadow rounded-4">
-                    <div class="card-header bg-primary text-white">
-                        Dataset Health
+                <div class="card h-100 shadow rounded-4 border-0">
+                    <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                        <h5 class="mb-0">❤️ Dataset Health</h5>
                     </div>
                     <div class="card-body p-4">
                         <p><strong>Status:</strong> {{ report.dataset_health }}</p>
@@ -267,9 +277,9 @@
 
         <div class="row mt-4">
             <div class="col-md-6">
-                <div class="card h-100 shadow rounded-4">
-                    <div class="card-header bg-primary text-white">
-                        Dataset Overview
+                <div class="card h-100 shadow rounded-4 border-0">
+                    <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                        <h5 class="mb-0">📈 Dataset Overview</h5>
                     </div>
                     <div class="card-body p-4">
                         <p>{{ report.dataset_overview }}</p>
@@ -278,9 +288,9 @@
             </div>
 
             <div class="col-md-6">
-                <div class="card h-100 shadow rounded-4">
-                    <div class="card-header bg-primary text-white">
-                        Machine Learning Readiness
+                <div class="card h-100 shadow rounded-4 border-0">
+                    <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                        <h5 class="mb-0">🤖 Machine Learning Readiness</h5>
                     </div>
                     <div class="card-body p-4">
                         <p><strong>Score:</strong> {{ report.ml_readiness_score }}%</p>
@@ -293,9 +303,9 @@
         
         <div class="row mt-4">
             <div class="col-md-6">
-                <div class="card h-100 shadow rounded-4">
-                    <div class="card-header bg-primary text-white">
-                        Smart Recommendations
+                <div class="card h-100 shadow rounded-4 border-0">
+                    <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                        <h5 class="mb-0">💡 Smart Recommendations</h5>
                     </div>
                     <div class="card-body p-4">
                         {% if report.recommendations %}
@@ -312,9 +322,9 @@
             </div>
 
             <div class="col-md-6">
-                <div class="card h-100 shadow rounded-4">
-                    <div class="card-header bg-primary text-white">
-                        Suggested Target Column
+                <div class="card h-100 shadow rounded-4 border-0">
+                    <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                        <h5 class="mb-0">🎯 Suggested Target Column</h5>
                     </div>
 
                     <div class="card-body p-4">
@@ -330,9 +340,9 @@
             </div>
         </div>
 
-        <div class="card mt-4 shadow-sm rounded-4">
-            <div class="card-header bg-primary text-white">
-                Column Names
+        <div class="card mt-4 shadow-sm rounded-4 border-0">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h5 class="mb-0">📋 Column Names</h5>
             </div>
             <div class="card-body p-4">
                 <ul>
@@ -343,18 +353,18 @@
             </div>
         </div>
 
-        <div class="card mt-4 shadow-sm rounded-4">
-            <div class="card-header bg-primary text-white">
-                Column Data Types
+        <div class="card mt-4 shadow-sm rounded-4 border-0">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h5 class="mb-0">🔠 Column Data Types</h5>
             </div>
             <div class="card-body p-4">
                 {{ report.column_types_html|safe }}
             </div>
         </div>
 
-        <div class="card mt-4 shadow-sm rounded-4">
-            <div class="card-header bg-primary text-white">
-                Unique Values
+        <div class="card mt-4 shadow-sm rounded-4 border-0">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h5 class="mb-0">🔢 Unique Values</h5>
             </div>
             <div class="card-body p-4">
                 {{ report.unique_values_html | safe }}
