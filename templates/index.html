@@ -57,6 +57,40 @@
             transform: translateY(-5px);
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
         }
+        /* Responsive Layout */
+        @media (max-width: 768px) {
+
+            .app-layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+                padding: 15px;
+            }
+
+            .sidebar h2 {
+                margin-bottom: 15px;
+            }
+
+            .sidebar nav {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 5px;
+            }
+
+            .sidebar a {
+                text-align: center;
+                padding: 10px 5px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
     </style>
     <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
 </head>
@@ -75,7 +109,11 @@
             <a href="#statistics">Statistics</a>
             <a href="#visualization">Visualization</a>
             <a href="#machine-learning">Machine Learning</a>
-            <a href="#prediction">Prediction</a>
+            {% if ml_ready is defined and ml_ready %}
+                <a href="#prediction">Prediction</a>
+            {% else %}
+                <a href="#machine-learning">Prediction</a>
+            {% endif %}
             <a href="#reports">Reports</a>
             <a href="#about">About</a>
         </nav>
@@ -97,9 +135,9 @@
             Version 0.1
         </p>
 
-        <div id="dataset" class="card mt-4 shadow-sm">
-            <div class="card-header bg-dark text-white">
-                Upload Dataset
+        <div id="dataset" class="card mt-4 shadow-sm rounded-4 border-0">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h5 class="mb-0">📁 Upload Dataset</h5>
             </div>
             <div class="card-body p-4">
             {% if not filename %}
@@ -371,27 +409,27 @@
             </div>
         </div>
         
-        <div class="card mt-4 shadow-sm rounded-4">
-            <div class="card-header bg-primary text-white">
-                Missing Values
+        <div class="card mt-4 shadow-sm rounded-4 border-0">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h5 class="mb-0">⚠️ Missing Values</h5>
             </div>
             <div class="card-body p-4">
                 {{ report.missing_values_html | safe }}
             </div>
         </div>
 
-        <div class="card mt-4 shadow-sm rounded-4">
-            <div class="card-header bg-primary text-white">
-                Missing Percentage
+        <div class="card mt-4 shadow-sm rounded-4 border-0">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h5 class="mb-0">📉 Missing Percentage</h5>
             </div>
             <div class="card-body p-4">
                 {{ report.missing_percentage_html | safe }}
             </div>
         </div>
 
-        <div class="card mt-4 shadow-sm rounded-4">
-            <div class="card-header bg-dark text-white">
-                Data Quality Analysis   
+        <div class="card mt-4 shadow-sm rounded-4 border-0">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h5 class="mb-0">🩺 Data Quality Analysis</h5>   
             </div>
             <div class="card-body p-4">
                 <p><strong>Duplicate Rows:</strong> {{ report.duplicate_rows }}</p>
@@ -438,9 +476,9 @@
             </div>
         </div>
 
-        <div  id="cleaning" class="card mt-4 shadow-sm rounded-4">
-            <div class="card-header bg-dark text-white">
-                Data Cleaning
+        <div  id="cleaning" class="card mt-4 shadow-sm rounded-4 border-0">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                 <h5 class="mb-0">🧹 Data Cleaning</h5>
             </div>
             <div class="card-body p-4">
                 <form action="/remove_duplicates" method="post" class="mb-3">
@@ -475,9 +513,9 @@
             </div>
         </div>
 
-        <div id="statistics" class="card mt-4 shadow-sm rounded-4">
-            <div class="card-header bg-dark text-white">
-                Statistics
+        <div id="statistics" class="card mt-4 shadow-sm rounded-4 border-0">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h5 class="mb-0">📊 Statistical Summary</h5>
             </div>
 
             <div class="card-body p-4">
@@ -530,9 +568,9 @@
 
         {% endif %}  
 
-        <div id="reports" class="card mt-4 shadow-sm rounded-4">
-            <div class="card-header bg-primary text-white">
-                Downloads
+        <div id="reports" class="card mt-4 shadow-sm rounded-4 border-0">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h5 class="mb-0">📥 Download Reports</h5>
             </div>
             <div class="card-body p-4">
                 <form action="/download_csv" method="get">
@@ -549,9 +587,9 @@
         </div>
         <br>
 
-        <div id="machine-learning" class="card mt-4 shadow-sm">
-            <div class="card-header bg-dark text-white">
-                Machine Learning
+        <div id="machine-learning" class="card mt-4 shadow-sm rounded-4 border-0">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h5 class="mb-0">🤖 Machine Learning</h5>
             </div>
 
             <div class="card-body">
@@ -715,9 +753,9 @@
                 <h5>Model Comparison</h5>
                 <p><strong>Best Model:</strong> {{ best_model }}</p>
 
-                <div id="prediction" class="card shadow-sm mt-4">
-                    <div class="card-header">
-                        Make a Prediction
+                <div id="prediction" class="card shadow-sm mt-4 rounded-4 border-0">
+                    <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                        <h5 class="mb-0">🔮 Make a Prediction</h5>
                     </div>
                     <div class="card-body">
                         <form action="/predict" method="POST">
@@ -756,9 +794,9 @@
         </div>
 
 
-        <div id="visualization" class="card mt-4 shadow-sm rounded-4">
-            <div class="card-header bg-primary text-white">
-                Data Visualization
+        <div id="visualization" class="card mt-4 shadow-sm rounded-4 border-0">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h5 class="mb-0">📈 Data Visualization</h5>
             </div>
             <div class="card-body p-4">
                 <form action="/show_histogram" method="post">
@@ -911,6 +949,36 @@
             </div>
         </div>
 
+        <div id="about" class="card mt-4 shadow-sm rounded-4 border-0">
+        <div class="card-header bg-primary text-white rounded-top-4 py-3">
+            <h5 class="mb-0">ℹ️ About DataSense AI</h5>
+        </div>
+
+        <div class="card-body p-4">
+            <h5>What is DataSense AI?</h5>
+
+            <p>
+                DataSense AI is an AI-powered data quality and model monitoring
+                platform that helps users explore, clean, analyze, and visualize
+                datasets, as well as train machine learning models and make predictions.
+            </p>
+
+            <h5>Key Features</h5>
+
+            <ul>
+                <li>Dataset analysis and quality assessment</li>
+                <li>Data cleaning and missing-value handling</li>
+                <li>Statistical analysis and visualization</li>
+                <li>Machine learning model training and evaluation</li>
+                <li>Predictions using trained models</li>
+                <li>Downloadable datasets and analysis reports</li>
+            </ul>
+
+            <p class="mb-0">
+                <strong>Developed by:</strong> Neelu Verma
+            </p>
+        </div>
+    </div>
         <footer class="bg-dark text-white text-center p-3 mt-5">
             <h5>DataSense AI</h5>
             <p class="mb-1">
