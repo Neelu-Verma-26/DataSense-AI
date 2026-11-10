@@ -59,6 +59,7 @@ def generate_dataset_report(df):
 
     numeric_df = df.select_dtypes(include="number")
     numeric_columns = numeric_df.shape[1]
+    numeric_column_names = numeric_df.columns.tolist()
 
     categorical_df = df.select_dtypes(include="object")
     categorical_columns = categorical_df.shape[1]
@@ -267,6 +268,7 @@ def generate_dataset_report(df):
     "table": table,
     "memory_usage": memory_size,
     "numeric_columns": numeric_columns, 
+    "numeric_column_names": numeric_column_names,
     "categorical_columns": categorical_columns,
     "column_types_html": column_types_html,
     "unique_values_html":unique_values_html,
@@ -517,6 +519,7 @@ def show_boxplot():
     
     df = pd.read_csv(file_path)
     column_data = df[selected_column]
+    column_data = pd.to_numeric(column_data, errors="coerce").dropna()
     plt.figure(figsize=(10,6))
     plt.boxplot(column_data)
     plt.title(f"Box Plot of {selected_column}", fontsize=16)

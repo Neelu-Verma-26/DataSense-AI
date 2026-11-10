@@ -802,7 +802,7 @@
                 <form action="/show_histogram" method="post">
                     <label for="column" class="form-label">Select Column:</label>
                     <select class="form-select" name="column" id="column">
-                        {% for column in report.column_names %}
+                        {% for column in report.numeric_column_names %}
                             <option value="{{ column }}">
                                 {{ column }}
                             </option>
@@ -819,7 +819,7 @@
                 <form action="/show_boxplot" method="post">
                     <label for="box_column" class="form-label">Select Column:</label>
                     <select class="form-select" name="column" id="box_column">
-                        {% for column in report.column_names %}
+                        {% for column in report.numeric_column_names %}
                             <option value="{{ column }}">
                                 {{ column }}
                             </option>
@@ -879,8 +879,7 @@
                     <label for="bar_column" class="form-label">Select Column:</label>
                     <select class="form-select" name="bar_column" id="bar_column">
                         {% for column in report.column_names %}
-                        <option value="{{ column }}">
-                            {% if column == selected_bar_column %}selected{% endif %}>
+                        <option value="{{ column }}"{% if column == selected_bar_column %}selected{% endif %}>
                             {{ column }}
                         </option>
                         {% endfor %}
@@ -931,8 +930,7 @@
                     <label for="pie_column" class="form-label">Select Column:</label>
                     <select class="form-select" name="pie_column" id="pie_column">
                         {% for column in report.column_names %}
-                        <option value="{{ column }}">
-                            {% if column == selected_pie_column %}selected{% endif %}>
+                        <option value="{{ column }}" {% if column == selected_pie_column %}selected{% endif %}>
                             {{ column }}
                         </option>
                         {% endfor %}
