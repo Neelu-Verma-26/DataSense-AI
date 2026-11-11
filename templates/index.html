@@ -840,7 +840,7 @@
                 <form action="/show_scatter" method="post">
                     <label for="x_column" class="form-label">Select X-axis: </label>
                     <select class="form-select" name="x_column" id="x_column">
-                        {% for column in report.column_names %}
+                        {% for column in report.numeric_column_names %}
                             <option value="{{ column }}">
                                 {{ column }}
                             </option>
@@ -849,7 +849,7 @@
 
                     <label for="y_column" class="form-label">Select Y-axis: </label>
                     <select class="form-select" name="y_column" id="y_column">
-                        {% for column in report.column_names %}
+                        {% for column in report.numeric_column_names %}
                             <option value="{{ column }}">
                                 {{ column }}
                             </option>

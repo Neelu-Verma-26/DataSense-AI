@@ -1,6 +1,8 @@
 from fileinput import filename
 from flask import Flask, render_template, request, session, send_file, url_for, redirect
 import pandas as pd
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
