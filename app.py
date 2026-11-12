@@ -671,11 +671,15 @@ def show_linechart():
             barchart_image = None,
             linechart_image = None)
 
-    x_data = df[x_column]
-    y_data = df[y_column]
+    plot_data = df[[x_column, y_column]].dropna()
+
+    plot_data = plot_data.sort_values(by=x_column)
+
+    x_data = plot_data[x_column]
+    y_data = plot_data[y_column]
 
     plt.figure(figsize=(10,6))
-    plt.plot(x_data, y_data)
+    plt.plot(x_data, y_data, marker='o')
     plt.title(f"Line Chart of {x_column} vs {y_column}", fontsize=16)
     plt.xlabel(x_column, fontsize=12)
     plt.ylabel(y_column, fontsize=12)
