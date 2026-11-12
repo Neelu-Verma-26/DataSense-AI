@@ -549,19 +549,30 @@ def show_scatter():
     df = pd.read_csv(file_path)
 
     report = generate_dataset_report(df)
+    if x_column not in df.columns or y_column not in df.columns:
+        return render_template(
+            "index.html",
+            line_error="Invalid column selection. Please select valid columns.",
+            report=report,
+            scatter_image=None,
+            histogram_image=None,
+            boxplot_image=None
+        )
 
     if not pd.api.types.is_numeric_dtype(df[x_column]) or not pd.api.types.is_numeric_dtype(df[y_column]):
         return render_template(
             "index.html",
-            filename=filename,
-            report = report,
+            line_error="Both X-axis and Y-axis columns must be numeric.",
+            report=report,
+            scatter_image=None,
             histogram_image=None,
-            boxplot_image=None,
-            scatter_image=None
+            boxplot_image=None
         )
 
-    x_data = df[x_column]
-    y_data = df[y_column]
+    plot_data = df[[x_column, y_column]].dropna()
+
+    x_data = plot_data[x_column]
+    y_data = plot_data[y_column]
 
     plt.figure(figsize=(10,6))
     plt.scatter(x_data, y_data)
@@ -624,9 +635,11 @@ def show_barchart():
     
     report = generate_dataset_report(df)
 
-    selected_column = request.form["bar_column"]
-
-    counts = df[selected_column].value_counts()
+    selected_column = request.form.get("bar_column")
+    if selected_column not in df.columns:
+        return "Invalid column selected", 400 
+      
+    counts = df[selected_column].dropna().value_counts()
     plt.figure(figsize=(10,6))
     plt.bar(counts.index, counts.values)
     plt.title(f"Bar Chart of {selected_column}", fontsize=16)
