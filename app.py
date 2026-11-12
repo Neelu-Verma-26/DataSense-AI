@@ -719,7 +719,7 @@ def show_piechart():
             piechart_image=None
         )
 
-    counts = df[selected_column].value_counts(dropna=False)
+    counts = df[selected_column].dropna().value_counts()
     plt.figure(figsize=(10,6))
     plt.pie(counts.values, labels=counts.index,  autopct="%1.1f%%")
     plt.title(f"Pie Chart of {selected_column}", fontsize=16)
