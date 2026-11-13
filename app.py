@@ -493,8 +493,25 @@ def show_histogram():
           return "Please upload a file first"
     
     df = pd.read_csv(file_path)
+    report = generate_dataset_report(df)
 
-    column_data = df[selected_column]
+    if selected_column not in df.columns:
+        return render_template(
+            "index.html",
+            report=report,
+            histogram_error="Invalid column selected. Please select a valid column.",
+            histogram_image=None
+        )
+
+    column_data = pd.to_numeric(df[selected_column], errors="coerce").dropna()
+
+    if column_data.empty:
+        return render_template(
+            "index.html",
+            report=report,
+            histogram_error="This column has no valid numerical data for a histogram.",
+            histogram_image=None
+        )
     plt.figure(figsize=(10,6))
     plt.hist(column_data, bins=20)
     plt.title(f"Histogram of {selected_column}", fontsize=16)
@@ -510,6 +527,7 @@ def show_histogram():
     return render_template("index.html",
                             filename=filename,
                             report=report,
+                            selected_histogram_column=selected_column,
                             histogram_image="histogram.png")
 
 @app.route("/show_boxplot", methods=["POST"])
@@ -520,8 +538,25 @@ def show_boxplot():
           return "Please upload a file first"
     
     df = pd.read_csv(file_path)
+    report = generate_dataset_report(df)
+
+    if selected_column not in df.columns:
+        return render_template(
+            "index.html",
+            report=report,
+            box_error="Invalid column selected. Please select a valid column.",
+            boxplot_image=None
+        )
+
     column_data = df[selected_column]
     column_data = pd.to_numeric(column_data, errors="coerce").dropna()
+    if column_data.empty:
+        return render_template(
+            "index.html",
+            report=report,
+            box_error="No valid numeric data available in this column to create a box plot.",
+            boxplot_image=None
+        )
     plt.figure(figsize=(10,6))
     plt.boxplot(column_data)
     plt.title(f"Box Plot of {selected_column}", fontsize=16)
@@ -536,7 +571,8 @@ def show_boxplot():
     return render_template("index.html",
                             filename=filename,
                             report=report,
-                            boxplot_image="boxplot.png")
+                            boxplot_image="boxplot.png",
+                            selected_box_column=selected_column)
 
 @app.route("/show_scatter", methods=["POST"])
 def show_scatter():
@@ -552,7 +588,7 @@ def show_scatter():
     if x_column not in df.columns or y_column not in df.columns:
         return render_template(
             "index.html",
-            line_error="Invalid column selection. Please select valid columns.",
+            scatter_error="Invalid column selection. Please select valid columns.",
             report=report,
             scatter_image=None,
             histogram_image=None,
@@ -562,7 +598,7 @@ def show_scatter():
     if not pd.api.types.is_numeric_dtype(df[x_column]) or not pd.api.types.is_numeric_dtype(df[y_column]):
         return render_template(
             "index.html",
-            line_error="Both X-axis and Y-axis columns must be numeric.",
+            scatter_error="Both X-axis and Y-axis columns must be numeric.",
             report=report,
             scatter_image=None,
             histogram_image=None,
@@ -586,6 +622,8 @@ def show_scatter():
     return render_template("index.html",
                            filename=filename,
                            report = report,
+                           selected_scatter_x=x_column,
+                           selected_scatter_y=y_column,
                            scatter_image= "scatter.png",
                            histogram_image=None,
                            boxplot_image=None)
@@ -602,7 +640,7 @@ def show_heatmap():
     numeric_df =  df.select_dtypes(include="number")
     if numeric_df.empty:
          return render_template("index.html",
-                                error="Dataset does not contain numeric columns.",
+                                heatmap_error="Dataset does not contain numeric columns.",
                                 report = report,
                                 histogram_image=None,
                                 boxplot_image=None,
@@ -610,6 +648,13 @@ def show_heatmap():
                                 heatmap_image = None)
     
     correlation_matrix = numeric_df.corr()
+    if correlation_matrix.isna().all().all():
+        return render_template(
+            "index.html",
+            report=report,
+            heatmap_error="Unable to generate heatmap because no valid correlations were found.",
+            heatmap_image=None
+        )
     plt.figure(figsize=(10,8))
     sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm")
     plt.tight_layout()
@@ -638,8 +683,22 @@ def show_barchart():
     selected_column = request.form.get("bar_column")
     if selected_column not in df.columns:
         return "Invalid column selected", 400 
-      
+
+    if selected_column not in df.columns:
+        return render_template(
+            "index.html",
+            report=report,
+            bar_error="Invalid column selected. Please select a valid column.",
+            barchart_image=None
+        )  
     counts = df[selected_column].dropna().value_counts()
+    if counts.empty:
+        return render_template(
+            "index.html",
+            report=report,
+            bar_error="No valid data available in this column to create a bar chart.",
+            barchart_image=None
+        )
     plt.figure(figsize=(10,6))
     plt.bar(counts.index, counts.values)
     plt.title(f"Bar Chart of {selected_column}", fontsize=16)
@@ -671,7 +730,26 @@ def show_linechart():
     df = pd.read_csv(file_path)
 
     report = generate_dataset_report(df)
+    if x_column not in df.columns or y_column not in df.columns:
+        return render_template(
+            "index.html",
+            line_error="Invalid column selected. Please select valid columns.",
+            report=report,
+            histogram_image=None,
+            boxplot_image=None,
+            scatter_image=None,
+            heatmap_image=None,
+            barchart_image=None,
+            linechart_image=None
+        )
 
+    if x_column not in df.columns or y_column not in df.columns:
+        return render_template(
+            "index.html",
+            report=report,
+            line_error="Invalid column selected. Please select valid columns.",
+            linechart_image=None
+        )
     if not pd.api.types.is_numeric_dtype(df[y_column]):
         return render_template(
             "index.html",
@@ -685,8 +763,30 @@ def show_linechart():
             linechart_image = None)
 
     plot_data = df[[x_column, y_column]].dropna()
+    if plot_data.empty:
+        return render_template(
+            "index.html",
+            report=report,
+            line_error="No valid data available to create a line chart.",
+            linechart_image=None
+        )
+    if plot_data.empty:
+        return render_template(
+            "index.html",
+            line_error="No valid data available to create the line chart.",
+            report=report,
+            histogram_image=None,
+            boxplot_image=None,
+            scatter_image=None,
+            heatmap_image=None,
+            barchart_image=None,
+            linechart_image=None
+        )
 
-    plot_data = plot_data.sort_values(by=x_column)
+    try:
+        plot_data = plot_data.sort_values(by=x_column)
+    except TypeError:
+        pass
 
     x_data = plot_data[x_column]
     y_data = plot_data[y_column]
@@ -703,6 +803,8 @@ def show_linechart():
     return render_template("index.html",
                            filename=filename,
                            report=report,
+                           selected_x_column=x_column,
+                           selected_y_column=y_column,
                            histogram_image=None,
                            boxplot_image=None,
                            scatter_image=None,
@@ -719,7 +821,22 @@ def show_piechart():
     
     report = generate_dataset_report(df)
 
-    selected_column = request.form["pie_column"]
+    selected_column = request.form.get("pie_column")
+
+    if selected_column not in df.columns:
+        return render_template(
+            "index.html",
+            report=report,
+            pie_error="Invalid column selected. Please select a valid column.",
+            piechart_image=None
+        )
+    if selected_column not in df.columns:
+        return render_template(
+            "index.html",
+            report=report,
+            pie_error="Invalid column selected. Please select a valid column.",
+            piechart_image=None
+        )
 
     if df[selected_column].nunique() > 10:
         return render_template(
@@ -737,6 +854,22 @@ def show_piechart():
         )
 
     counts = df[selected_column].dropna().value_counts()
+    if counts.empty:
+        return render_template(
+            "index.html",
+            report=report,
+            selected_pie_column=selected_column,
+            pie_error="No valid data available in this column to create a pie chart.",
+            piechart_image=None
+        )
+    if counts.empty:
+        return render_template(
+            "index.html",
+            report=report,
+            selected_pie_column=selected_column,
+            pie_error="No valid data available in this column to create a pie chart.",
+            piechart_image=None
+        )
     plt.figure(figsize=(10,6))
     plt.pie(counts.values, labels=counts.index,  autopct="%1.1f%%")
     plt.title(f"Pie Chart of {selected_column}", fontsize=16)

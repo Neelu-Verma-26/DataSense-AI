@@ -799,11 +799,17 @@
                 <h5 class="mb-0">📈 Data Visualization</h5>
             </div>
             <div class="card-body p-4">
+                {% if histogram_error %}
+                    <div class="alert alert-danger mt-3">
+                        {{ histogram_error }}
+                    </div>
+                {% endif %}
                 <form action="/show_histogram" method="post">
                     <label for="column" class="form-label">Select Column:</label>
                     <select class="form-select" name="column" id="column">
                         {% for column in report.numeric_column_names %}
-                            <option value="{{ column }}">
+                            <option value="{{ column }}"
+                            {% if selected_histogram_column == column %}selected{% endif %}>
                                 {{ column }}
                             </option>
                         {% endfor %} 
@@ -816,11 +822,17 @@
                 {% endif %}
 
                 <hr class="my-4">
+                {% if box_error %}
+                    <div class="alert alert-danger mt-3">
+                        {{ box_error }}
+                    </div>
+                {% endif %}
                 <form action="/show_boxplot" method="post">
                     <label for="box_column" class="form-label">Select Column:</label>
                     <select class="form-select" name="column" id="box_column">
                         {% for column in report.numeric_column_names %}
-                            <option value="{{ column }}">
+                            <option value="{{ column }}"
+                            {% if selected_box_column == column %}selected{% endif %}>
                                 {{ column }}
                             </option>
                         {% endfor %}
@@ -833,15 +845,17 @@
                 {% endif %}
 
                 <hr class="my-4">
-                {% if error %}
-                    <p style="color:red;">{{ error }}</p>
+                {% if scatter_error %}
+                    <div class="alert alert-danger mt-3">
+                        {{ scatter_error }}
+                    </div>
                 {% endif %}
-
                 <form action="/show_scatter" method="post">
                     <label for="x_column" class="form-label">Select X-axis: </label>
                     <select class="form-select" name="x_column" id="x_column">
                         {% for column in report.numeric_column_names %}
-                            <option value="{{ column }}">
+                            <option value="{{ column }}"
+                            {% if column == selected_scatter_x %}selected{% endif %}>
                                 {{ column }}
                             </option>
                         {% endfor %}
@@ -850,7 +864,8 @@
                     <label for="y_column" class="form-label">Select Y-axis: </label>
                     <select class="form-select" name="y_column" id="y_column">
                         {% for column in report.numeric_column_names %}
-                            <option value="{{ column }}">
+                            <option value="{{ column }}"
+                            {% if column == selected_scatter_y %}selected{% endif %}>
                                 {{ column }}
                             </option>
                         {% endfor %}
@@ -865,6 +880,11 @@
                 {% endif %}
 
                 <hr class="my-4">
+                {% if heatmap_error %}
+                    <div class="alert alert-danger mt-3">
+                        {{ heatmap_error }}
+                    </div>
+                {% endif %}
                 <form action="/show_heatmap" method="post">
                     <button type="submit" class="btn btn-primary mt-3 me-2 mb-2">Show Heatmap</button>
                 </form>
@@ -875,6 +895,11 @@
                 {% endif %}
 
                 <hr class="my-4">
+                {% if bar_error %}
+                    <div class="alert alert-danger mt-3">
+                        {{ bar_error }}
+                    </div>
+                {% endif %}
                 <form action="/show_barchart" method="post">
                     <label for="bar_column" class="form-label">Select Column:</label>
                     <select class="form-select" name="bar_column" id="bar_column">
@@ -894,13 +919,16 @@
 
                 <hr class="my-4">
                 {% if line_error %}
-                    <p style="color:red;">{{ line_error }}</p>
+                    <div class="alert alert-danger mt-3">
+                        {{ line_error }}
+                    </div>
                 {% endif %}
                 <form action="/show_linechart" method="post">
                     <label for="x_column" class="form-label">Select X-axis: </label>
                     <select class="form-select" name="x_column" id="x_column">
                         {% for column in report.column_names %}
-                            <option value="{{ column }}">
+                            <option value="{{ column }}"
+                            {% if column == selected_x_column %}selected{% endif %}>
                                 {{ column }}
                             </option>
                         {% endfor %}
@@ -909,7 +937,8 @@
                     <label for="y_column" class="form-label">Select Y-axis: </label>
                     <select class="form-select" name="y_column" id="y_column">
                         {% for column in report.column_names %}
-                            <option value="{{ column }}">
+                            <option value="{{ column }}"
+                            {% if column == selected_y_column %}selected{% endif %}>
                                 {{ column }}
                             </option>
                         {% endfor %}
@@ -924,7 +953,9 @@
 
                 <hr class="my-4">
                 {% if pie_error %}
-                <p style="color:red;">{{ pie_error }}</p>
+                    <div class="alert alert-danger mt-3">
+                        {{ pie_error }}
+                    </div>
                 {% endif %}
                 <form action="/show_piechart" method="post">
                     <label for="pie_column" class="form-label">Select Column:</label>
