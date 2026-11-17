@@ -1,4 +1,3 @@
-from fileinput import filename
 from flask import Flask, render_template, request, session, send_file, url_for, redirect
 import pandas as pd
 import matplotlib
@@ -315,6 +314,7 @@ def upload():
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
  
         filename = uploaded_file.filename
+        session["filename"] = filename
         file_path = os.path.join(UPLOAD_FOLDER, uploaded_file.filename)
        
         session["file_path"] = file_path
@@ -525,7 +525,7 @@ def show_histogram():
     report = generate_dataset_report(df)
 
     return render_template("index.html",
-                            filename=filename,
+                            filename=session.get("filename"),
                             report=report,
                             selected_histogram_column=selected_column,
                             histogram_image="histogram.png")
@@ -569,7 +569,7 @@ def show_boxplot():
     report = generate_dataset_report(df)
 
     return render_template("index.html",
-                            filename=filename,
+                            filename=session.get("filename"),
                             report=report,
                             boxplot_image="boxplot.png",
                             selected_box_column=selected_column)
@@ -606,6 +606,13 @@ def show_scatter():
         )
 
     plot_data = df[[x_column, y_column]].dropna()
+    if plot_data.empty:
+        return render_template(
+            "index.html",
+            report=report,
+            scatter_error="No valid data available to create a scatter plot.",
+            scatter_image=None
+        )
 
     x_data = plot_data[x_column]
     y_data = plot_data[y_column]
@@ -620,7 +627,7 @@ def show_scatter():
     plt.close()
 
     return render_template("index.html",
-                           filename=filename,
+                           filename=session.get("filename"),
                            report = report,
                            selected_scatter_x=x_column,
                            selected_scatter_y=y_column,
@@ -664,7 +671,7 @@ def show_heatmap():
     plt.close()
 
     return render_template("index.html",
-                            filename=filename,
+                            filename=session.get("filename"),
                             report=report,
                             histogram_image=None,
                             boxplot_image=None,
@@ -681,8 +688,6 @@ def show_barchart():
     report = generate_dataset_report(df)
 
     selected_column = request.form.get("bar_column")
-    if selected_column not in df.columns:
-        return "Invalid column selected", 400 
 
     if selected_column not in df.columns:
         return render_template(
@@ -710,7 +715,7 @@ def show_barchart():
     plt.close()
 
     return render_template("index.html",
-                            filename=filename,
+                            filename=session.get("filename"),
                             report=report,
                             histogram_image=None,
                             boxplot_image=None,
@@ -743,13 +748,6 @@ def show_linechart():
             linechart_image=None
         )
 
-    if x_column not in df.columns or y_column not in df.columns:
-        return render_template(
-            "index.html",
-            report=report,
-            line_error="Invalid column selected. Please select valid columns.",
-            linechart_image=None
-        )
     if not pd.api.types.is_numeric_dtype(df[y_column]):
         return render_template(
             "index.html",
@@ -768,18 +766,6 @@ def show_linechart():
             "index.html",
             report=report,
             line_error="No valid data available to create a line chart.",
-            linechart_image=None
-        )
-    if plot_data.empty:
-        return render_template(
-            "index.html",
-            line_error="No valid data available to create the line chart.",
-            report=report,
-            histogram_image=None,
-            boxplot_image=None,
-            scatter_image=None,
-            heatmap_image=None,
-            barchart_image=None,
             linechart_image=None
         )
 
@@ -801,7 +787,7 @@ def show_linechart():
     plt.close()
 
     return render_template("index.html",
-                           filename=filename,
+                           filename=session.get("filename"),
                            report=report,
                            selected_x_column=x_column,
                            selected_y_column=y_column,
@@ -823,13 +809,6 @@ def show_piechart():
 
     selected_column = request.form.get("pie_column")
 
-    if selected_column not in df.columns:
-        return render_template(
-            "index.html",
-            report=report,
-            pie_error="Invalid column selected. Please select a valid column.",
-            piechart_image=None
-        )
     if selected_column not in df.columns:
         return render_template(
             "index.html",
@@ -862,14 +841,7 @@ def show_piechart():
             pie_error="No valid data available in this column to create a pie chart.",
             piechart_image=None
         )
-    if counts.empty:
-        return render_template(
-            "index.html",
-            report=report,
-            selected_pie_column=selected_column,
-            pie_error="No valid data available in this column to create a pie chart.",
-            piechart_image=None
-        )
+
     plt.figure(figsize=(10,6))
     plt.pie(counts.values, labels=counts.index,  autopct="%1.1f%%")
     plt.title(f"Pie Chart of {selected_column}", fontsize=16)
@@ -880,7 +852,7 @@ def show_piechart():
     plt.close()
 
     return render_template("index.html",
-                            filename=filename,
+                            filename=session.get("filename"),
                             report=report,
                             histogram_image=None,
                             boxplot_image=None,
@@ -987,7 +959,7 @@ def prepare_ml():
         return render_template(
             "index.html",
             report=report,
-            filename=filename,
+            filename=session.get("filename"),
             target_column=target_column,
             problem_type=problem_type,
             ml_error=f"'{target_column}' must be a numeric column for Linear Regression."
